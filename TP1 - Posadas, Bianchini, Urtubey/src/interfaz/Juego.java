@@ -50,22 +50,15 @@ public class Juego {
 		_frame.getContentPane().setLayout(null);
 	  	
 		_genNumeroRandom = new Random();
-		System.out.println("Genero el random");
 		_directorioImagenes = "src/datos/imagenes";
-		System.out.println("Genero el dir de imagenes");
 		setearImagenAleatoria();
-		System.out.println("Seteo Imagen");
 		Point[] posiciones = calcularPosiciones(_dimTablero, _dimPiezas);
-		System.out.println("Genero las posiciones: " + Arrays.asList(posiciones));
-		generarPiezas(posiciones);
-		System.out.println("Genero las piezas");
-		//agregarPiezasAlJuego();
-		System.out.println("Agrego las piezas");
+		setearPiezas(posiciones);
 		
   }
   
-  private void generarPiezas(Point[] posiciones){
-	ImageIcon[] imagenesPiezas  = _imagen.cortarImagen(_dimPiezas);
+  private void setearPiezas(Point[] posiciones){
+	ImageIcon[] imagenesPiezas  = _imagen.cortarImagen(_dimTablero);
 	_arregloPiezas = new Pieza[_dimTablero*_dimTablero];
 	for(int i=0; i<_arregloPiezas.length; i++){
 		_arregloPiezas[i] = new Pieza(i, imagenesPiezas[i], posiciones[i], _dimPiezas, _dimPiezas);
@@ -77,16 +70,8 @@ public class Juego {
 	  File f = new File(_directorioImagenes);
 	  File[] listaImagenes = f.listFiles();
 	  String s = listaImagenes[_genNumeroRandom.nextInt(listaImagenes.length)].getPath();
-	  System.out.println(s);
 	  _imagen = new ImageEditor(s);
-	  System.out.println("Dim de la imagen" + _dimPiezas*_dimTablero);
 	  _imagen.resize(_dimPiezas*_dimTablero, _dimPiezas*_dimTablero);
-  }
-  
-  private void agregarPiezasAlJuego(){
-	  for(Pieza p:_arregloPiezas)
-		  //_frame.getContentPane().add(p);
-		  _frame.getContentPane().add(p);
   }
   
   private Point[] calcularPosiciones(int dim, int dist){
@@ -101,7 +86,7 @@ public class Juego {
 			orden[i] = i;
 		}
 		
-		//orden = desordenarPosiciones(orden);
+		orden = desordenarPosiciones(orden);
 		
 		int x = 0;
 		int y = 0;
