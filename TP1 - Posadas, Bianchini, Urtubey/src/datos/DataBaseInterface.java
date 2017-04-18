@@ -27,16 +27,16 @@ public class DataBaseInterface {
 	 * raiz de la unidad desde donde se ejecuta la aplicacion. A partir de esa ruta, puede especificarse una ruta diferente, pero los
 	 * directorios deben existir.
 	 *@Ejemplo
-	 *new DataBaseInterface("org.sqlite.JDBC", "/database/test.sqlite") 
+	 *new DataBaseInterface("/database/test.sqlite") 
 	 *
 	 */
-	public DataBaseInterface(String dataBaseDriver, String dataBaseName) {
+	public DataBaseInterface(String dataBaseName) {
 		initLogger();
 		
 		this.dataBaseName = dataBaseName;
 
 		try {
-			Class.forName(dataBaseDriver);
+			Class.forName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e) {
 			_logger.log(Level.INFO, e.getMessage());
 		}
@@ -86,10 +86,10 @@ public class DataBaseInterface {
 	 * Este metodo auxiliar privado construye un dataBaseObject a partir de un query
 	 * @param sql String con sentencia sql
 	 */
-	private dataBaseObject _buildSearch(String sql) throws SQLException {
+	private DataBaseObject _buildSearch(String sql) throws SQLException {
 		ResultSet query = this._query(sql);
 		
-		dataBaseObject search = new dataBaseObject();
+		DataBaseObject search = new DataBaseObject();
 		
 		while (query.next()){
 			HashMap<String, String> row = new HashMap<>();
@@ -206,7 +206,7 @@ public class DataBaseInterface {
 			_logger.log(Level.INFO, e.getMessage());
 		}
 	}
-	
+		
 	/**
 	 * Este metodo borra los registros que cumplan con la condicion establecida
 	 * @param tableName String con Nombre de la tabla
@@ -236,10 +236,21 @@ public class DataBaseInterface {
 	 * Este metodo devuelve un dataBaseObject con toda la informacion de la tabla
 	 * @param tableName String con el nombre de la tabla
 	 */
-	public dataBaseObject search(String tableName){
+	public DataBaseObject select(String tableName){
 		try {
-			String sql = "select * from "+tableName+";";
+			String sql = "SELECT * FROM "+  tableName + ";";
+			return _buildSearch(sql);
+		}
+		catch( Exception e ){
+			_logger.log(Level.INFO, e.getMessage());
+		}
+		return null;
 		
+	}
+	
+	public DataBaseObject select(String tableName, String orderByColum, boolean descendent){
+		try {
+			String sql = "SELECT * FROM "+  tableName + " ORDER BY " + orderByColum + ((descendent)?" DESC":"") + ";";
 			return _buildSearch(sql);
 		}
 		catch( Exception e ){
@@ -256,7 +267,7 @@ public class DataBaseInterface {
 	 * @Ejemplo
 	 * search("SCORE", new String[][]{{"name","=","juan"},{"score",">","100"}});
 	 */
-	public dataBaseObject search(String tableName, String[][] domain){
+	public DataBaseObject select(String tableName, String[][] domain){
 		try{
 			StringBuilder domainString = new StringBuilder();
 			for (String[] condition : domain){
@@ -264,7 +275,7 @@ public class DataBaseInterface {
 			}
 			String domainSubString = domainString.substring(0, domainString.length()-5);
 
-			String sql = "select * from "+tableName+" where "+domainSubString+";";
+			String sql = "SELECT * FROM "+ tableName + " WHERE "+ domainSubString + ";";
 			
 			return _buildSearch(sql);
 		}
@@ -274,4 +285,29 @@ public class DataBaseInterface {
 		return null;
 	}
 	
+	public void update(String tableName, String modification, String[][] domain){
+		StringBuilder temp = new StringBuilder();
+		temp.append("UPDATE ").append(tableName).append(" SET ").append(modification);
+		
+		try{
+			StringBuilder domainString = new StringBuilder();
+			for (String[] condition : domain){
+				domainString.append(condition[0]+condition[1]+"'"+condition[2]+"' AND ");				
+			}
+			String domainSubString = domainString.substring(0, domainString.length()-5);
+
+			String sql = temp + domainSubString + ";";
+			
+			_update(sql);
+		}
+		catch( Exception e ){
+			_logger.log(Level.INFO, e.getMessage());
+		}
+		
+	}
+	
+	public Integer getRowCount() throws SQLException{
+		ResultSet query = _query("SELECT COUNT(*) AS rowcount FROM puntajes");
+		return query.getInt("rowcount");
+	}
 }

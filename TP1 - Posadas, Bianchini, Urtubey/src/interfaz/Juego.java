@@ -41,7 +41,6 @@ public class Juego {
   private Point[] _posiciones;
   private Ventana _ventanaEmergentePuntos;
 
-  
   //TODO: La DB, solo hay que cargar los .java y llamarlo desde el Tablero para obtener los puntajes.
   public Juego() throws Exception {
 	  initialize();
