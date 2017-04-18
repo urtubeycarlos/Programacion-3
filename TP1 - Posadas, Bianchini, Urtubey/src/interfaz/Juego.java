@@ -50,18 +50,17 @@ public class Juego {
   public void initialize() throws Exception{
 	  
 		_genNumeroRandom = new Random();
-		_dimTablero = 4;
+		_dimTablero = 2;
 		_dimPiezas = 150;
 		_listaPiezas = new ArrayList<Pieza>();
-		_ventanaEmergentePuntos = new Ventana(50);
-		_ventanaEmergentePuntos.mostrar();
 		
 	  	_frame = new JFrame();
-		_frame.setBounds(100, 100, (_dimTablero*_dimPiezas)+15, (_dimTablero*_dimPiezas)+37);
+		_frame.setBounds(160, 90, (_dimTablero*_dimPiezas)+2, (_dimTablero*_dimPiezas)+20);
+		_frame.setLocationRelativeTo(null);
 		_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		_frame.getContentPane().setLayout(null);
+	  	_frame.setResizable(false);
 	  	
-
 		_directorioImagenes = "src/datos/imagenes";
 		seleccionarImagenAleatoria();
 		_posiciones = generarPosiciones(_dimTablero, _dimPiezas);
@@ -81,6 +80,8 @@ public class Juego {
 	for(int IDs=0; IDs<_posiciones.length; IDs++){
 		listaIDsPosibles.add(IDs);
 	}
+	
+// Algoritmo para no mezclar las piezas de la imagen.
 	
 //	int i = 0;
 //	while( !listaIDsPosibles.isEmpty() ){
@@ -114,6 +115,8 @@ public class Juego {
 				continue;
 			} System.out.println("Gano!");
 			_hiloDeControl.interrupt();
+			_ventanaEmergentePuntos = new Ventana(Tablero.obtenerPuntaje());
+			_ventanaEmergentePuntos.mostrar();
 		}
 	  });
 	  

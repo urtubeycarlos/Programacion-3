@@ -1,11 +1,11 @@
 package logica;
 
 import interfaz.Pieza;
-import datos.GestorPuntajes;
+//import datos.GestorPuntajes;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.sql.SQLException;
+//import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Tablero {
@@ -13,12 +13,12 @@ public class Tablero {
 	private Pieza _piezaVacia;
 	private Pieza[] _piezas;
 	private Thread _hiloDeControl;
-	private int _cantMovimientos; 
-	//private GestorPuntajes _gestorPuntajes;
+	public static int _cantMovimientos; 
+//	private GestorPuntajes _gestorPuntajes;
 
 	public Tablero() throws Exception{
 		_cantMovimientos = 0;
-		//_gestorPuntajes = new GestorPuntajes();
+//		_gestorPuntajes = new GestorPuntajes();
 	}
 	
 	public void setearPiezas(ArrayList<Pieza> piezas){
@@ -71,7 +71,7 @@ public class Tablero {
 		_hiloDeControl.interrupt();
 	}
 	
-	public int obtenerPuntaje(){
+	public static int obtenerPuntaje(){
 		return _cantMovimientos;
 	}
 	

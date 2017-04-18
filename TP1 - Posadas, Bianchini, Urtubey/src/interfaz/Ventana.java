@@ -37,10 +37,6 @@ public class Ventana extends JDialog {
 			JButton btnNewButton = new JButton(""+ puntos);
 			btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			btnNewButton.setEnabled(false);
-			btnNewButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-				}
-			});
 			btnNewButton.setBounds(150, 67, 142, 44);
 			contentPanel.add(btnNewButton);
 		}
