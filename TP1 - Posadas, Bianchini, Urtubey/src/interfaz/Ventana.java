@@ -15,25 +15,9 @@ import javax.swing.JTextField;
 
 public class Ventana extends JDialog {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
-	private static Integer puntaje;
 	private JTextField Nombre;
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			Ventana dialog = new Ventana(puntaje);
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Create the dialog.
@@ -49,9 +33,8 @@ public class Ventana extends JDialog {
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		lblNewLabel.setBounds(98, 11, 275, 62);
 		contentPanel.add(lblNewLabel);
-		this.puntaje = puntos;
 		{
-			JButton btnNewButton = new JButton(""+ puntaje);
+			JButton btnNewButton = new JButton(""+ puntos);
 			btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			btnNewButton.setEnabled(false);
 			btnNewButton.addActionListener(new ActionListener() {
@@ -102,5 +85,10 @@ public class Ventana extends JDialog {
 				buttonPane.add(cancelButton);
 			}
 		}
+	}
+	
+	public void mostrar(){
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setVisible(true);
 	}
 }

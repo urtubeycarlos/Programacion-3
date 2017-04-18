@@ -1,28 +1,32 @@
 package logica;
 
 import interfaz.Pieza;
+import datos.GestorPuntajes;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Tablero {
 
-	ArrayList<Pieza> _piezas;
-	Thread _hiloDeControl;
-	Pieza _piezaVacia;
-	
-	//FIXME: ES mejor usar un arreglo estatico.
-	public Tablero(){
-		_piezas = new ArrayList<Pieza>();
+	private Pieza _piezaVacia;
+	private Pieza[] _piezas;
+	private Thread _hiloDeControl;
+	private int _cantMovimientos; 
+	//private GestorPuntajes _gestorPuntajes;
+
+	public Tablero() throws Exception{
+		_cantMovimientos = 0;
+		//_gestorPuntajes = new GestorPuntajes();
 	}
 	
 	public void setearPiezas(ArrayList<Pieza> piezas){
-		for(Pieza p:piezas){
-			_piezas.add(p);
-			if(p.ID == 0)
-				_piezaVacia = p;
+		_piezas = new Pieza[piezas.size()];
+		for(int i=0; i<piezas.size(); i++){
+			_piezas[i] = piezas.get(i);
+			if( piezas.get(i).ID == 0 )
+				_piezaVacia = piezas.get(i);
 		} setearThreadDeControl();
 		iniciarHiloDeControl();
 	}
@@ -32,8 +36,8 @@ public class Tablero {
 //			if ( i != _piezas.get(i).ID)
 //				return false;
 //		return true;
-		for(int i=0; i<_piezas.size()-1; i++){
-			if( i != _piezas.get(i).ID){
+		for(int i=0; i<_piezas.length; i++){
+			if( i != _piezas[i].ID){
 				return false;
 			}
 		} return true;
@@ -48,9 +52,8 @@ public class Tablero {
 					for(Pieza p:_piezas){
 						if( p.isTouched() ){
 							if( estanAlineadas(p, _piezaVacia) ){
-								System.out.println("Entro!");
 								swapearPiezas(p, _piezaVacia);
-								System.out.println(_piezas);
+								_cantMovimientos++;
 							} p.setTouched(false);
 						}
 					}
@@ -68,6 +71,19 @@ public class Tablero {
 		_hiloDeControl.interrupt();
 	}
 	
+	public int obtenerPuntaje(){
+		return _cantMovimientos;
+	}
+	
+//	public boolean guardarPuntaje(String nombre){
+//		try {
+//			_gestorPuntajes.insertarPuntaje(nombre, obtenerPuntaje());
+//			return true;
+//		} catch (SQLException e) {
+//			return false;
+//		}
+//	}
+	
 	private void swapearPiezas(Pieza p1, Pieza p2){
 		
 		Rectangle rectPieza1 = new Rectangle(p1.getBounds());
@@ -75,18 +91,12 @@ public class Tablero {
 		p2.setBounds(rectPieza1);
 		p1.setBounds(rectPieza2);
 		
-		int indiceP1 = _piezas.indexOf(p1);
-		int indiceP2 = _piezas.indexOf(p2);
-		_piezas.remove(p1); 
-		_piezas.remove(p2);
-
-		if(indiceP1 < indiceP2 ){
-			_piezas.add(indiceP1, p2);
-			_piezas.add(indiceP2, p1);
-		} else {
-			_piezas.add(indiceP2, p1);
-			_piezas.add(indiceP1, p2);
-		}
+		int indiceP1 = obtenerIndice(p1);
+		int indiceP2 = obtenerIndice(p2);
+		
+		Pieza temp = _piezas[indiceP1];
+		_piezas[indiceP1] = _piezas[indiceP2];
+		_piezas[indiceP2] = temp;
 		
 	}
 	
@@ -104,6 +114,14 @@ public class Tablero {
 		double ret = Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2);
 		ret = Math.sqrt(ret);
 		return (int) ret;
+	}
+	
+	private int obtenerIndice(Pieza p){
+		for(int i=0; i<_piezas.length; i++){
+			if(_piezas[i].ID == p.ID){
+				return i;
+			}
+		} return -1;
 	}
 	
 }

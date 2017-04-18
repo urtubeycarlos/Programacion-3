@@ -1,18 +1,18 @@
 package datos;
 
+
 import java.sql.*;
 import java.util.ArrayList;
-
 import logica.Tupla;
 
 //FIXME: Arreglar los metodos usando la API nueva de Juan
-public class GestorPuntajes {
+public class GestorPuntajes{
 
 	private DataBaseInterface _db;
 	
 	public GestorPuntajes() throws Exception{
 		_db = new DataBaseInterface("org.sqlite.JDBC", "src/Datos/db/puntos.db");
-		_db.openConnection();
+		_db._openConnection();
 	}
 	
 	public ArrayList<Tupla<String, Integer>> obtenerPuntajes() throws SQLException{

@@ -2,10 +2,8 @@ package interfaz;
 
 import java.awt.EventQueue;
 import java.awt.Point;
-import java.awt.font.NumericShaper.Range;
 import java.io.File;
 import java.io.IOException;
-import java.io.LineNumberInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -41,19 +39,22 @@ public class Juego {
   private Tablero _tablero;
   private Thread _hiloDeControl;
   private Point[] _posiciones;
+  private Ventana _ventanaEmergentePuntos;
 
   
   //TODO: La DB, solo hay que cargar los .java y llamarlo desde el Tablero para obtener los puntajes.
-  public Juego() throws IOException {
+  public Juego() throws Exception {
 	  initialize();
   }
 
-  public void initialize() throws IOException{
+  public void initialize() throws Exception{
 	  
 		_genNumeroRandom = new Random();
 		_dimTablero = 4;
 		_dimPiezas = 150;
 		_listaPiezas = new ArrayList<Pieza>();
+		_ventanaEmergentePuntos = new Ventana(50);
+		_ventanaEmergentePuntos.mostrar();
 		
 	  	_frame = new JFrame();
 		_frame.setBounds(100, 100, (_dimTablero*_dimPiezas)+15, (_dimTablero*_dimPiezas)+37);
@@ -80,6 +81,14 @@ public class Juego {
 	for(int IDs=0; IDs<_posiciones.length; IDs++){
 		listaIDsPosibles.add(IDs);
 	}
+	
+//	int i = 0;
+//	while( !listaIDsPosibles.isEmpty() ){
+//		_listaPiezas.add(i, new Pieza(i, imagenesPiezas[i], _posiciones[i], _dimPiezas, _dimPiezas));
+//		_frame.add(_listaPiezas.get(i));
+//		i++;
+//	}
+	
 	int i = 0;
 	while( !listaIDsPosibles.isEmpty() ){
 		int idRandom = listaIDsPosibles.removeRandom();
@@ -87,6 +96,7 @@ public class Juego {
 		_frame.add(_listaPiezas.get(i));
 		i++;
 	}
+	
   }
 
   private void seleccionarImagenAleatoria() throws IOException{

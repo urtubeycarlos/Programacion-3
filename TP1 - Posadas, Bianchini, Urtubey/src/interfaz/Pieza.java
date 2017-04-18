@@ -40,6 +40,7 @@ public class Pieza extends JButton {
 		return this.isTouched;
 	}
 	
+	@Override
 	public String toString(){
 		return "Pieza número " + ID.toString();
 	}
