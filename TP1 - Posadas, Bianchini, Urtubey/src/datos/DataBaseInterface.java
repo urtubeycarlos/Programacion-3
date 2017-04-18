@@ -285,27 +285,6 @@ public class DataBaseInterface {
 		return null;
 	}
 	
-	public void update(String tableName, String modification, String[][] domain){
-		StringBuilder temp = new StringBuilder();
-		temp.append("UPDATE ").append(tableName).append(" SET ").append(modification);
-		
-		try{
-			StringBuilder domainString = new StringBuilder();
-			for (String[] condition : domain){
-				domainString.append(condition[0]+condition[1]+"'"+condition[2]+"' AND ");				
-			}
-			String domainSubString = domainString.substring(0, domainString.length()-5);
-
-			String sql = temp + domainSubString + ";";
-			
-			_update(sql);
-		}
-		catch( Exception e ){
-			_logger.log(Level.INFO, e.getMessage());
-		}
-		
-	}
-	
 	public Integer getRowCount() throws SQLException{
 		ResultSet query = _query("SELECT COUNT(*) AS rowcount FROM puntajes");
 		return query.getInt("rowcount");

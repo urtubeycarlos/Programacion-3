@@ -3,9 +3,6 @@ package datos;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import logica.Tupla;
-
-
 public class DataBaseObject {
 	
 	private ArrayList<HashMap<String, String>> maplist;
