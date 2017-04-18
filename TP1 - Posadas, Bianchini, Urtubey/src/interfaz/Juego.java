@@ -2,16 +2,20 @@ package interfaz;
 
 import java.awt.EventQueue;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 import javax.swing.JFrame;
 
 import logica.ArrayListRandom;
 import logica.Tablero;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 public class Juego {
 
@@ -41,7 +45,6 @@ public class Juego {
   private Point[] _posiciones;
   private Ventana _ventanaEmergentePuntos;
 
-  //TODO: La DB, solo hay que cargar los .java y llamarlo desde el Tablero para obtener los puntajes.
   public Juego() throws Exception {
 	  initialize();
   }
@@ -49,30 +52,61 @@ public class Juego {
   public void initialize() throws Exception{
 	  
 		_genNumeroRandom = new Random();
-		_dimTablero = 2;
-		_dimPiezas = 150;
+		_dimTablero = 3;
+		_dimPiezas = 128;
 		_listaPiezas = new ArrayList<Pieza>();
 		
 	  	_frame = new JFrame();
 		_frame.setBounds(160, 90, (_dimTablero*_dimPiezas)+2, (_dimTablero*_dimPiezas)+20);
 		_frame.setLocationRelativeTo(null);
 		_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		_frame.getContentPane().setLayout(null);
-	  	_frame.setResizable(false);
+//	  	_frame.setResizable(false);
+	  	_frame.getContentPane().setLayout(null);
+	  	
+	  	JMenuBar menuBar = new JMenuBar();
+	  	menuBar.setBounds(0, 0, 93, 21);
+	  	_frame.getContentPane().add(menuBar);
+	  	
+	  	JMenu menuJuego = new JMenu("Archivo");
+	  	menuBar.add(menuJuego);
+	  	
+	  	JMenuBar menuBar2 = new JMenuBar();
+		menuBar.setToolTipText("");
+		menuBar.setBounds(0, 0, 90, 21);
+		_frame.getContentPane().add(menuBar2);
+		
+		JMenu mnNewMenu2 = new JMenu("Ver");
+		menuBar.add(mnNewMenu2);
+		
+		JMenuItem mntmPuntajes = new JMenuItem("Puntajes");
+		mnNewMenu2.add(mntmPuntajes);
+		
+		mntmPuntajes.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Puntajes puntaje = new Puntajes(_tablero);
+				puntaje.mostrar();
+			}
+		});
+	  		   	
+	  	JMenuItem mntmSalir = new JMenuItem("Salir");
+	  	menuJuego.add(mntmSalir);
+	  	
+	  	mntmSalir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.exit(0);
+			}
+		});
 	  	
 		_directorioImagenes = "src/datos/imagenes";
 		seleccionarImagenAleatoria();
 		_posiciones = generarPosiciones(_dimTablero, _dimPiezas);
-		System.out.println(Arrays.asList(_posiciones));
 		setearPiezas();
 		_tablero = new Tablero();
-		System.out.println("Lista de piezas: " + _listaPiezas);
 		_tablero.setearPiezas(_listaPiezas);
 		setearHiloDeControl();
 
   }
   
-  //FIXME: Hay que generar bien las imagenes, es decir, la relacion indice/imagen debe estar ok y a su vez deben estar desordenadas las posiciones. Estaba hecho pero solo dios sabe en que archivo de cual proyecto esta :v
   private void setearPiezas(){
 	Imagen[] imagenesPiezas  = _imagen.dividirImagen(_dimTablero);
 	ArrayListRandom<Integer> listaIDsPosibles = new ArrayListRandom<Integer>();
@@ -81,9 +115,9 @@ public class Juego {
 	}
 	
 // Algoritmo para no mezclar las piezas de la imagen.
-	
+//	
 //	int i = 0;
-//	while( !listaIDsPosibles.isEmpty() ){
+//	while( i < _posiciones.length ){
 //		_listaPiezas.add(i, new Pieza(i, imagenesPiezas[i], _posiciones[i], _dimPiezas, _dimPiezas));
 //		_frame.add(_listaPiezas.get(i));
 //		i++;
@@ -93,7 +127,7 @@ public class Juego {
 	while( !listaIDsPosibles.isEmpty() ){
 		int idRandom = listaIDsPosibles.removeRandom();
 		_listaPiezas.add(i, new Pieza(idRandom, imagenesPiezas[idRandom], _posiciones[i], _dimPiezas, _dimPiezas));
-		_frame.add(_listaPiezas.get(i));
+		_frame.getContentPane().add(_listaPiezas.get(i));
 		i++;
 	}
 	
@@ -112,9 +146,9 @@ public class Juego {
 		public void run() {
 			while( !_tablero.gano() ){
 				continue;
-			} System.out.println("Gano!");
+			}
 			_hiloDeControl.interrupt();
-			_ventanaEmergentePuntos = new Ventana(Tablero.obtenerPuntaje());
+			_ventanaEmergentePuntos = new Ventana(_tablero);
 			_ventanaEmergentePuntos.mostrar();
 		}
 	  });
@@ -124,76 +158,26 @@ public class Juego {
   
   private Point[] generarPosiciones(int dim, int dist){
 	  	int tam = dim*dim;
-		
 		Point[] posiciones = new Point[tam];
-		
 		int[] orden = new int[tam];
 		
 		for(int i=0;i<tam;i++){
-			
 			orden[i] = i;
 		}
 		
-		//orden = desordenarPosiciones(orden);
-		
 		int x = 0;
-		int y = 0;
-		
+		int y = 25; //Antes estaba 0 acá
 		int cont = 0;
 		
 		for(int i=0;i<tam;i++){
-			
 			posiciones[orden[i]]= new Point(x,y);
-			
 			x += dist;
-						
 			cont++;
-			
 			if(cont>dim-1){
-				
 				y += dist;
 				x = 0;
 				cont = 0;
 			}
-		
-		}
-		return posiciones;
+		} return posiciones;
   }
-//  
-//  private int[] desordenarPosiciones(int[] posiciones){
-//	  	int[] ret = new int[posiciones.length];
-//		
-//		if(posiciones.length-1<0) return ret;
-//		
-//		int corte = _genNumeroRandom.nextInt(posiciones.length);
-//		
-//		ret[0] = posiciones[corte];
-//		
-//		if(posiciones.length-1==0) return ret;
-//		
-//		int[] siguiente = new int[posiciones.length-1];
-//		
-//		int j = 0;		
-//				
-//		for(int i=0; i<posiciones.length;i++){
-//
-//			if(i!=corte){
-//				siguiente[j] = posiciones[i];
-//				j++;
-//			}
-//		}			
-//		
-//		int[] nuevo = desordenarPosiciones(siguiente);
-//		
-//		j=1;
-//		
-//		for(int i=0;i<nuevo.length;i++){
-//			
-//			ret[j] = nuevo[i];
-//			j++;
-//		}
-//		
-//		return ret;
-//  }
-  
 }

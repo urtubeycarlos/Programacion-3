@@ -59,7 +59,6 @@ public class DataBaseInterface {
 		_logger.setLevel(Level.INFO);
     }
 
-	//Metodos privados
 	private void _openConnection() throws SQLException {
 		this.connection = DriverManager.getConnection("jdbc:sqlite:"+ this.dataBaseName);
 		this.stmt = this.connection.createStatement();
@@ -103,8 +102,6 @@ public class DataBaseInterface {
 	}
 	
 	
-	//Metodos publicos
-	
 	/**
 	 * Este metodo devuelve un ArrayList con los nombres de las tablas de la base. (Se usa en test para borrar todas las tablas)
 	 */
@@ -141,15 +138,15 @@ public class DataBaseInterface {
 			for (String column : columns){
 				columnsString.append(column+" text, ");
 			}
+			
 			String columnsSubString = columnsString.substring(0, columnsString.length()-2);
-			String sql = "create table "+tableName+" ("+columnsSubString+");";
+			String sql = "CREATE TABLE IF NOT EXISTS "+tableName+" ("+columnsSubString+");";
 			
 			this._update(sql);
 		}
 		catch( Exception e ){
 			_logger.log(Level.INFO, e.getMessage());
 		}
-		
 				
 	}
 	
@@ -187,6 +184,7 @@ public class DataBaseInterface {
 			ResultSet tableStructure = this._query(sql);
 			
 			while(tableStructure.next()){
+				System.out.println(tableStructure.getString(2));
 				columnNames.append(tableStructure.getString(2)+", ");
 			}
 			tableStructure.close();

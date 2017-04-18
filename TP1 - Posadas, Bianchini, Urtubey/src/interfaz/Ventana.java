@@ -7,6 +7,9 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import logica.Tablero;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
@@ -18,11 +21,10 @@ public class Ventana extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField Nombre;
+	private Tablero _tablero;
 
-	/**
-	 * Create the dialog.
-	 */
-	public Ventana(Integer puntos) {
+	public Ventana(Tablero tablero) {
+		_tablero = tablero;
 		setBounds(270, 210, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -34,7 +36,7 @@ public class Ventana extends JDialog {
 		lblNewLabel.setBounds(98, 11, 275, 62);
 		contentPanel.add(lblNewLabel);
 		{
-			JButton btnNewButton = new JButton(""+ puntos);
+			JButton btnNewButton = new JButton(""+ _tablero.obtenerPuntaje());
 			btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
 			btnNewButton.setEnabled(false);
 			btnNewButton.setBounds(150, 67, 142, 44);
@@ -61,6 +63,7 @@ public class Ventana extends JDialog {
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						String nombre = Nombre.getText();
+						_tablero.guardarPuntaje(nombre);
 						System.out.println(nombre);
 						System.exit(0);
 					}

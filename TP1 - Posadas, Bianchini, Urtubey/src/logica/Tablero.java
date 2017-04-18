@@ -7,6 +7,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 //import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import datos.GestorPuntajes;
 
 public class Tablero {
 
@@ -14,11 +17,11 @@ public class Tablero {
 	private Pieza[] _piezas;
 	private Thread _hiloDeControl;
 	public static int _cantMovimientos; 
-//	private GestorPuntajes _gestorPuntajes;
+	private GestorPuntajes _gestorPuntajes;
 
 	public Tablero() throws Exception{
 		_cantMovimientos = 0;
-//		_gestorPuntajes = new GestorPuntajes();
+		_gestorPuntajes = new GestorPuntajes();
 	}
 	
 	public void setearPiezas(ArrayList<Pieza> piezas){
@@ -32,10 +35,6 @@ public class Tablero {
 	}
 	
 	public synchronized boolean gano(){
-//		for(int i=0; i<_piezas.size(); i++)
-//			if ( i != _piezas.get(i).ID)
-//				return false;
-//		return true;
 		for(int i=0; i<_piezas.length; i++){
 			if( i != _piezas[i].ID){
 				return false;
@@ -57,8 +56,7 @@ public class Tablero {
 							} p.setTouched(false);
 						}
 					}
-				} System.out.println(_piezas);
-				finalizarJuego();
+				} finalizarJuego();
 			}
 		}); 
 	}
@@ -71,18 +69,17 @@ public class Tablero {
 		_hiloDeControl.interrupt();
 	}
 	
-	public static int obtenerPuntaje(){
+	public int obtenerPuntaje(){
 		return _cantMovimientos;
 	}
 	
-//	public boolean guardarPuntaje(String nombre){
-//		try {
-//			_gestorPuntajes.insertarPuntaje(nombre, obtenerPuntaje());
-//			return true;
-//		} catch (SQLException e) {
-//			return false;
-//		}
-//	}
+	public HashMap<Integer, Tupla<String, Integer>> obtenerPuntajes(){
+		return _gestorPuntajes.obtenerPuntuaciones();
+	}
+	
+	public void guardarPuntaje(String nombre){
+		_gestorPuntajes.insertarPuntaje(nombre, obtenerPuntaje());
+	}
 	
 	private void swapearPiezas(Pieza p1, Pieza p2){
 		
