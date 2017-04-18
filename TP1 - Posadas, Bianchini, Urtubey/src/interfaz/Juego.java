@@ -35,6 +35,8 @@ public class Juego {
   private Imagen _imagen;
   private Tablero _tablero;
 
+  
+  //TODO: La DB, solo hay que cargar los .java y llamarlo desde el Tablero para obtener los puntajes.
   public Juego() throws IOException {
 	  initialize();
   }
@@ -58,6 +60,7 @@ public class Juego {
 			System.out.println("Gano!");
   }
   
+  //FIXME: Hay que generar bien las imagenes, es decir, la relacion indice/imagen debe estar ok y a su vez deben estar desordenados. Estaba hecho pero solo dios sabe en que archivo de cual proyecto esta :v
   private void setearPiezas(Point[] posiciones){
 	Imagen[] imagenesPiezas  = _imagen.dividirImagen(_dimTablero);
 	_arregloPiezas = new Pieza[_dimTablero*_dimTablero];
