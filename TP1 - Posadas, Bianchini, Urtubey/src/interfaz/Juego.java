@@ -1,17 +1,14 @@
 package interfaz;
 
 import java.awt.EventQueue;
-import java.awt.Image;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Random;
 
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
-import logica.ImageEditor;
+import logica.Tablero;
 
 public class Juego {
 
@@ -35,7 +32,8 @@ public class Juego {
   private Pieza[] _arregloPiezas;
   private int _dimTablero, _dimPiezas;
   private String _directorioImagenes;
-  private ImageEditor _imagen;
+  private Imagen _imagen;
+  private Tablero _tablero;
 
   public Juego() throws IOException {
 	  initialize();
@@ -54,11 +52,14 @@ public class Juego {
 		setearImagenAleatoria();
 		Point[] posiciones = calcularPosiciones(_dimTablero, _dimPiezas);
 		setearPiezas(posiciones);
-		
+		_tablero = new Tablero();
+		_tablero.setearPiezas(_arregloPiezas);
+		if( _tablero.gano() )
+			System.out.println("Gano!");
   }
   
   private void setearPiezas(Point[] posiciones){
-	ImageIcon[] imagenesPiezas  = _imagen.cortarImagen(_dimTablero);
+	Imagen[] imagenesPiezas  = _imagen.dividirImagen(_dimTablero);
 	_arregloPiezas = new Pieza[_dimTablero*_dimTablero];
 	for(int i=0; i<_arregloPiezas.length; i++){
 		_arregloPiezas[i] = new Pieza(i, imagenesPiezas[i], posiciones[i], _dimPiezas, _dimPiezas);
@@ -69,9 +70,10 @@ public class Juego {
   private void setearImagenAleatoria() throws IOException{
 	  File f = new File(_directorioImagenes);
 	  File[] listaImagenes = f.listFiles();
-	  String s = listaImagenes[_genNumeroRandom.nextInt(listaImagenes.length)].getPath();
-	  _imagen = new ImageEditor(s);
-	  _imagen.resize(_dimPiezas*_dimTablero, _dimPiezas*_dimTablero);
+	  //String s = listaImagenes[_genNumeroRandom.nextInt(listaImagenes.length)].getPath();
+	  //_imagen = new Imagen(s);
+	  _imagen = new Imagen(listaImagenes[_genNumeroRandom.nextInt(listaImagenes.length)]);
+	  _imagen.redimensionarImagen(_dimPiezas*_dimTablero, _dimPiezas*_dimTablero);
   }
   
   private Point[] calcularPosiciones(int dim, int dist){
