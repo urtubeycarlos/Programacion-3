@@ -12,18 +12,21 @@ import logica.Tablero;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JLabel;
+
 import java.awt.Font;
+
 import javax.swing.JTextField;
 
-public class Ventana extends JDialog {
+public class VentanaVictoria extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField Nombre;
 	private Tablero _tablero;
 
-	public Ventana(Tablero tablero) {
+	public VentanaVictoria(Tablero tablero) {
 		_tablero = tablero;
 		setBounds(270, 210, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
@@ -63,9 +66,12 @@ public class Ventana extends JDialog {
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						String nombre = Nombre.getText();
-						_tablero.guardarPuntaje(nombre);
-						System.out.println(nombre);
-						System.exit(0);
+						if(!nombre.equals("")){
+							_tablero.guardarPuntaje(nombre);
+							dispose();
+							Puntajes _ventanaEmergentePuntos2 = new Puntajes(_tablero);
+							_ventanaEmergentePuntos2.mostrar();
+						}
 					}
 				});
 				okButton.setActionCommand("OK");

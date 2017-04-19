@@ -184,7 +184,6 @@ public class DataBaseInterface {
 			ResultSet tableStructure = this._query(sql);
 			
 			while(tableStructure.next()){
-				System.out.println(tableStructure.getString(2));
 				columnNames.append(tableStructure.getString(2)+", ");
 			}
 			tableStructure.close();

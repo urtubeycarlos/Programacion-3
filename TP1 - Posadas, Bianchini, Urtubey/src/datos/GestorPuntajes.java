@@ -13,7 +13,7 @@ public class GestorPuntajes{
 	}
 	
 	public HashMap<Integer, Tupla<String, Integer>> obtenerPuntuaciones(){
-		DataBaseObject res = _db.select("puntajes", "pts", true);
+		DataBaseObject res = _db.select("puntajes", "pts", false);
 		HashMap<Integer, Tupla<String, Integer>> ret = new HashMap<Integer, Tupla<String, Integer>>();
 		
 		Integer i = 1;

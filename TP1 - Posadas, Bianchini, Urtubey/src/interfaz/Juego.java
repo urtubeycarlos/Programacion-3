@@ -43,7 +43,7 @@ public class Juego {
   private Tablero _tablero;
   private Thread _hiloDeControl;
   private Point[] _posiciones;
-  private Ventana _ventanaEmergentePuntos;
+  private VentanaVictoria _ventanaEmergentePuntos;
 
   public Juego() throws Exception {
 	  initialize();
@@ -52,15 +52,15 @@ public class Juego {
   public void initialize() throws Exception{
 	  
 		_genNumeroRandom = new Random();
-		_dimTablero = 3;
+		_dimTablero = 4;
 		_dimPiezas = 128;
 		_listaPiezas = new ArrayList<Pieza>();
 		
 	  	_frame = new JFrame();
-		_frame.setBounds(160, 90, (_dimTablero*_dimPiezas)+2, (_dimTablero*_dimPiezas)+20);
+		_frame.setBounds(160, 90, (_dimTablero*_dimPiezas)+2, (_dimTablero*_dimPiezas)+_dimPiezas/2);
 		_frame.setLocationRelativeTo(null);
 		_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//	  	_frame.setResizable(false);
+	  	_frame.setResizable(false);
 	  	_frame.getContentPane().setLayout(null);
 	  	
 	  	JMenuBar menuBar = new JMenuBar();
@@ -114,7 +114,7 @@ public class Juego {
 		listaIDsPosibles.add(IDs);
 	}
 	
-// Algoritmo para no mezclar las piezas de la imagen.
+// //Algoritmo para no mezclar las piezas de la imagen.
 //	
 //	int i = 0;
 //	while( i < _posiciones.length ){
@@ -148,7 +148,7 @@ public class Juego {
 				continue;
 			}
 			_hiloDeControl.interrupt();
-			_ventanaEmergentePuntos = new Ventana(_tablero);
+			_ventanaEmergentePuntos = new VentanaVictoria(_tablero);
 			_ventanaEmergentePuntos.mostrar();
 		}
 	  });

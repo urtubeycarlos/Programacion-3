@@ -29,29 +29,24 @@ public class Puntajes extends JDialog {
 	public Puntajes(Tablero tablero) {
 		
 		_tablero = tablero;
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 600);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		
-		//Tomo el tamaño de la pantalla 
 		Dimension pantallaTamano = Toolkit.getDefaultToolkit().getScreenSize(); 
-		//Al ancho de la pantalla lo divido en 2 y le resto la mitad del ancho de mi ventana, con eso queda centrada en el eje X, para el eje Y es lo mismo pero con el alto: 
 		this.setLocation((pantallaTamano.width/2)-(this.getWidth()/2), (pantallaTamano.height/2)-(this.getHeight()/2)); 
 				
 		{
 			JTable tblEjemplo = new JTable();
 	        JScrollPane scpEjemplo= new JScrollPane();
-	        //Llenamos el modelo
 	        DefaultTableModel dtmEjemplo = new DefaultTableModel(getFilas(),
 	                                                             getColumnas());
 	 
 	        tblEjemplo=new JTable(dtmEjemplo){
-	        /**
-				 * 
-				 */
-				private static final long serialVersionUID = 1L;
+			
+	        private static final long serialVersionUID = 1L;
 
 			public boolean isCellEditable(int rowIndex, int vColIndex) {
 	            return false;
@@ -60,24 +55,13 @@ public class Puntajes extends JDialog {
 	        tblEjemplo.setModel(dtmEjemplo);
 	        scpEjemplo.add(tblEjemplo);
 	        this.add(scpEjemplo);
-	        this.setSize(500, 100);
+	        this.setSize(500, 300);
 	        scpEjemplo.setViewportView(tblEjemplo);
 		}
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.WEST);
-			{
-				JButton cancelButton = new JButton("Cerrar");
-				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
-				cancelButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						System.exit(0);
-					}
-				});
-
-			}
 		}
 	}
 	
@@ -88,23 +72,17 @@ public class Puntajes extends JDialog {
 	
 	private Object[][] getFilas(){
 		 HashMap<Integer, Tupla<String, Integer>> datos = _tablero.obtenerPuntajes();
-		 
 		 Object fila [][] = new Object [datos.size()][3];
 		 
 		 for(Integer i = 0; i <datos.size(); i++){
-			 fila[i][0] = i;
-			 fila [i][1] = datos.get(i).elem1;
-			 fila [i][2] = datos.get(i).elem2;
-		 }
-//         Object fila[][]=new Object[][] {
-//                            {"1", "Pedro", "22"},
-//                            {"2", "Rumpelstinsky", "24"},
-//                            {"3", "Shrek", "33"}};
-         return fila;
+			 fila[i][0] = i+1;
+			 fila [i][1] = datos.get(i+1).elem1;
+			 fila [i][2] = datos.get(i+1).elem2;
+		 }  return fila;
     }
 	
 	private String[] getColumnas(){
-	          String columna[]=new String[]{"Puesto","Nombres","Puntajes"};
+	          String columna[] = new String[]{"Puesto","Nombres","Puntajes"};
 	          return columna;
 	}
 
