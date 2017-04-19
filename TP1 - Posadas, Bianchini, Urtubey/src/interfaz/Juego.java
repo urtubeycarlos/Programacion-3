@@ -52,7 +52,7 @@ public class Juego {
   public void initialize() throws Exception{
 	  
 		_genNumeroRandom = new Random();
-		_dimTablero = 4;
+		_dimTablero = 2;
 		_dimPiezas = 128;
 		_listaPiezas = new ArrayList<Pieza>();
 		
