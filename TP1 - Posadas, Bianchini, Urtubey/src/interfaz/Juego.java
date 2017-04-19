@@ -166,7 +166,7 @@ public class Juego {
 		}
 		
 		int x = 0;
-		int y = 25; //Antes estaba 0 acá
+		int y = 25;
 		int cont = 0;
 		
 		for(int i=0;i<tam;i++){
