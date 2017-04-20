@@ -7,6 +7,13 @@ import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
+/**
+ * 
+ * @author alumnos
+ *
+ * Representa una pieza del rompecabezas
+ *
+ */
 public class Pieza extends JButton {
 
 	private static final long serialVersionUID = -5308806731775293982L;

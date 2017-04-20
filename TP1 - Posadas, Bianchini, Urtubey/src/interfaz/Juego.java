@@ -52,7 +52,7 @@ public class Juego {
   public void initialize() throws Exception{
 	  
 		_genNumeroRandom = new Random();
-		_dimTablero = 2;
+		_dimTablero = 4;
 		_dimPiezas = 128;
 		_listaPiezas = new ArrayList<Pieza>();
 		
@@ -107,6 +107,13 @@ public class Juego {
 
   }
   
+  /**
+   * 
+   * Divide una imagen, seleccionada previamente de forma aleatoria, y la divide en tantas imagenes como piezas tenga el juego.
+   * Finalmente toma una de las imagenes obtenidas de forma aleatoria y se la asigna a una pieza junto con su ID correspondiente y
+   * una posición del arreglo de posiciones.
+   * 
+   */
   private void setearPiezas(){
 	Imagen[] imagenesPiezas  = _imagen.dividirImagen(_dimTablero);
 	ArrayListRandom<Integer> listaIDsPosibles = new ArrayListRandom<Integer>();
@@ -133,6 +140,13 @@ public class Juego {
 	
   }
 
+  /**
+   * 
+   * Devuelve una imagen de forma aleatoria tomando del directorio establecido internamente.
+   * 
+   * @throws IOException
+   * 
+   */
   private void seleccionarImagenAleatoria() throws IOException{
 	  File f = new File(_directorioImagenes);
 	  File[] listaImagenes = f.listFiles();
@@ -140,6 +154,12 @@ public class Juego {
 	  _imagen.redimensionarImagen(_dimPiezas*_dimTablero, _dimPiezas*_dimTablero);
   }
   
+  
+  /**
+   * Setea un hilo de ejecución que se encarga de controlar constantemente si el jugador gano.
+   * En caso de que el jugador gane interrumpe la ejecución y muestra la ventana para que el jugador
+   * muestre su nombre.
+   */
   private void setearHiloDeControl(){
 	  _hiloDeControl = new Thread(new Runnable() {
 		@Override
@@ -156,6 +176,13 @@ public class Juego {
 	  _hiloDeControl.start();
   }
   
+  /**
+   * 
+   * @param La cantidad de piezas deseadas para el tablero.
+   * @param El tamaño de cada pieza.
+   * @return Devuelve un arreglo de posiciones generado a base de calculos realizados con los parametros ingresados.
+   * 
+   */
   private Point[] generarPosiciones(int dim, int dist){
 	  	int tam = dim*dim;
 		Point[] posiciones = new Point[tam];
