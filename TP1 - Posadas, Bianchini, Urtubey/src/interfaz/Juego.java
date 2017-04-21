@@ -43,7 +43,6 @@ public class Juego {
   private Tablero _tablero;
   private Thread _hiloDeControl;
   private Point[] _posiciones;
-  private VentanaVictoria _ventanaEmergentePuntos;
 
   public Juego() throws Exception {
 	  initialize();
@@ -168,7 +167,7 @@ public class Juego {
 				continue;
 			}
 			_hiloDeControl.interrupt();
-			_ventanaEmergentePuntos = new VentanaVictoria(_tablero);
+			VentanaVictoria _ventanaEmergentePuntos = new VentanaVictoria(_tablero);
 			_ventanaEmergentePuntos.mostrar();
 		}
 	  });
