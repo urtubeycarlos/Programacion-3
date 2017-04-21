@@ -5,14 +5,10 @@ import java.util.Collection;
 import java.util.Random;
 
 /**
- * 
  * @author alumnos
- *
  * @param <E> Tipo de elemento del cual sera el ArrayList
  * 
  * Un ArrayList tipico con la posibilidad de extraer un elemento aleatorio de la lista.
- * 
- * 
  */
 
 public class ArrayListRandom<E> extends ArrayList<E> {

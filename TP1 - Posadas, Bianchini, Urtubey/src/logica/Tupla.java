@@ -1,14 +1,11 @@
 package logica;
 
 /**
- * 
  * @author Bianchini, Posadas, Urtubey
- *
  * @param <T1> Tipo 1 para el primer elemento de la tupla
  * @param <T2> Tipo 2 para el primer elemento de la tupla
  * 
  * Representa una tupla, es decir una secuencia de dos elementos del tipo predifinido previamente.
- * 
  */
 public class Tupla<T1, T2> {
 	public final T1 elem1;

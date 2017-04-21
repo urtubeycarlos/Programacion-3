@@ -11,6 +11,11 @@ import java.util.HashMap;
 
 import datos.GestorPuntajes;
 
+/**
+ * @author Bianchini Juan, Posadas Sebastian, Urtubey Carlos
+ *
+ *Representa el tablero de juego que se encarga la administrar la logica del juego.
+ */
 public class Tablero {
 
 	private Pieza _piezaVacia;
@@ -24,6 +29,10 @@ public class Tablero {
 		_gestorPuntajes = new GestorPuntajes();
 	}
 	
+	/**
+	 * @param piezas ArrayList de las piezas del juego que se van a agregar al 
+	 * tablero para administrar los eventos y la logica de movimientos de las piezas.
+	 */
 	public void setearPiezas(ArrayList<Pieza> piezas){
 		_piezas = new Pieza[piezas.size()];
 		for(int i=0; i<piezas.size(); i++){
@@ -42,6 +51,12 @@ public class Tablero {
 		} return true;
 	}
 	
+	/**
+	 * Setea un hilo de control para checkear constantemente si se presiono alguna pieza.
+	 * En caso de que se haya presionado alguna, checkea si esta alineada con la pieza vacia, en caso 
+	 * de que esto ultimo se cumpla finalmente hace un swap entre la misma pieza y la pieza vacia y suma uno
+	 * a la cantidad de movimientos.
+	 */
 	private void setearThreadDeControl() {
 		_hiloDeControl = new Thread(new Runnable() {
 			
@@ -61,18 +76,31 @@ public class Tablero {
 		}); 
 	}
 	
+	/**
+	 * Inicia el hilo que va a controlar el estado de las piezas.
+	 */
 	private void iniciarHiloDeControl(){
 		_hiloDeControl.start();
 	}
 	
+	/**
+	 * Finaliza el juego terminando el hilo de ejecución para que no se controlen mas las piezas.
+	 */
 	public void finalizarJuego(){
 		_hiloDeControl.interrupt();
 	}
 	
+	/**
+	 * @return Devuelve el puntaje obtenido en el juego. 
+	 */
 	public int obtenerPuntaje(){
 		return _cantMovimientos;
 	}
 	
+	/**
+	 * @return Devuelve un HashMap de puntuaciones que contiene como "llave" la posicion del jugador
+	 * y como "valor" una Tupla conformada por la secuencia ( 'nombre del jugador', 'puntaje')
+	 */
 	public HashMap<Integer, Tupla<String, Integer>> obtenerPuntajes(){
 		return _gestorPuntajes.obtenerPuntuaciones();
 	}

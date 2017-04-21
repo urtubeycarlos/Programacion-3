@@ -1,5 +1,10 @@
 package interfaz;
 
+/**
+ * @author alumnos
+ *
+ *Representa un pixel de una imagen en formato RGB
+ */
 public class Pixel {
 	
 	public int red;
