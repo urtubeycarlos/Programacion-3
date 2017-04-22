@@ -21,7 +21,7 @@ public class Tablero {
 	private Pieza _piezaVacia;
 	private Pieza[] _piezas;
 	private Thread _hiloDeControl;
-	public static int _cantMovimientos; 
+	public int _cantMovimientos; 
 	private GestorPuntajes _gestorPuntajes;
 
 	public Tablero() throws Exception{
