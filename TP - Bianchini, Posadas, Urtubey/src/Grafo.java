@@ -6,7 +6,7 @@ public class Grafo {
 	// Representamos el grafo por medio de listas de vecinos
 	private ArrayList<HashSet<Integer>> _vecinos;
 
-	// El grafo se construye sin aristas
+	// El grafo se construye sin aristas. el indice es el vertice, el hashset son sus vecinos
 	public Grafo(int verticesIniciales){
 		_vecinos = new ArrayList<HashSet<Integer>>();
 		
