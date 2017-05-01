@@ -23,13 +23,13 @@ public class Mapa {
 		return _coordenadas;
 	}
 	
-	public void agregarRelacion(Coordenada c1, Coordenada c2){
-		agregarRelacion(c1, c2, 0);
+	public void agregarRuta(Coordenada c1, Coordenada c2){
+		agregarRuta(c1, c2, 0);
 	}
 	
-	public void agregarRelacion(Coordenada c1, Coordenada c2, int cantPeajes){
-		chequearCoordenada(c1, "agregar una relacion");
-		chequearCoordenada(c2, "agregar una relacion");
+	public void agregarRuta(Coordenada c1, Coordenada c2, int cantPeajes){
+		chequearCoordenada(c1, "agregar una ruta");
+		chequearCoordenada(c2, "agregar una ruta");
 		_grafoMapa.agregarArista(_coordenadas.indexOf(c1), _coordenadas.indexOf(c2), obtenerDistancia(c1, c2), cantPeajes);
 	}
 
