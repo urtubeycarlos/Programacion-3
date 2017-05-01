@@ -7,12 +7,14 @@ import grafo.GrafoPesado;
 
 public class Mapa {
 
-	private GrafoPesado _grafoMapa;
+	private GrafoPesado _grafoDistanciasMapa;
+	private GrafoPesado _grafoPeajesMapa;
 	private ArrayList<Coordenada> _coordenadas;
 	
 	public Mapa(List<Coordenada> listaCoordenadas){
 
-		_grafoMapa = new GrafoPesado(listaCoordenadas.size());
+		_grafoDistanciasMapa = new GrafoPesado(listaCoordenadas.size());
+		_grafoPeajesMapa = new GrafoPesado(listaCoordenadas.size());
 		for(int i=0; i<listaCoordenadas.size(); i++){
 			_coordenadas.add(listaCoordenadas.get(i));
 		}
@@ -30,12 +32,15 @@ public class Mapa {
 	public void agregarRuta(Coordenada c1, Coordenada c2, int cantPeajes){
 		chequearCoordenada(c1, "agregar una ruta");
 		chequearCoordenada(c2, "agregar una ruta");
-		_grafoMapa.agregarArista(_coordenadas.indexOf(c1), _coordenadas.indexOf(c2), obtenerDistancia(c1, c2), cantPeajes);
+		int iCoord1 = _coordenadas.indexOf(c1);
+		int iCoord2 = _coordenadas.indexOf(c2);
+		_grafoDistanciasMapa.agregarArista(iCoord1, iCoord2, calcularDistancia(c1, c2));
+		_grafoPeajesMapa.agregarArista(iCoord1, iCoord2, cantPeajes);
 	}
 
 
-	//TODO: Calcular distancia en plano 2D
-	private int obtenerDistancia(Coordenada c1, Coordenada c2){
+	//TODO: Calcular distancia en plano R2
+	private int calcularDistancia(Coordenada c1, Coordenada c2){
 		return 0;
 	}
 
