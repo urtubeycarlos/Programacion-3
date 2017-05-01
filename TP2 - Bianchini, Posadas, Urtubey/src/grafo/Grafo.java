@@ -60,13 +60,13 @@ public class Grafo {
 	}	
 
 	// Verifica que un índice corresponda a un vértice válido
-	private void chequearVertice(int i, String consulta){
+	protected void chequearVertice(int i, String consulta){
 		if( i < 0 || i >= getVertices())
 			throw new IllegalArgumentException("Se intentó consultar " + consulta + " de un vértice inexistente! i = " + i);
 	}
 
 	// Verifica que los vértices puedan corresponder a una arista
-	private void chequearArista(int i, int j, String accion){
+	protected void chequearArista(int i, int j, String accion){
 		if( i < 0 || i >= getVertices() )
 			throw new IllegalArgumentException("Se intentó " + accion + " una arista con un vértice inexistente! i = " + i);
 		
