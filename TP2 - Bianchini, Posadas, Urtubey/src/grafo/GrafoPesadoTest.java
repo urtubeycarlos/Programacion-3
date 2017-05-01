@@ -6,8 +6,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import grafo.Grafo;
-
 public class GrafoPesadoTest {
 
 	private GrafoPesado _grafoPesado;
