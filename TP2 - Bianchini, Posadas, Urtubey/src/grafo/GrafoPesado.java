@@ -1,7 +1,7 @@
 package grafo;
 
 //FIXME: Para no romper el invariante de representacion habría que tener dos GrafoPesado en Mapa
-//FIME: Uno para los peajes y otro para las distancias.
+//FIXME: Uno para los peajes y otro para las distancias.
 
 public class GrafoPesado extends Grafo {
 	
