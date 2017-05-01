@@ -1,11 +1,14 @@
 package grafo;
 
-public class GrafoPesadoMapa extends Grafo {
+//FIXME: Para no romper el invariante de representacion habría que tener dos GrafoPesado en Mapa
+//FIME: Uno para los peajes y otro para las distancias.
+
+public class GrafoPesado extends Grafo {
 	
 	private int[][] _matrizPesos;
 	private int[][] _matrizPeajes;
 	
-	public GrafoPesadoMapa(int verticesIniciales) {
+	public GrafoPesado(int verticesIniciales) {
 		super(verticesIniciales);
 		//Se amortiza para una futura rendimension
 		_matrizPesos = new int[verticesIniciales*4][verticesIniciales*4];

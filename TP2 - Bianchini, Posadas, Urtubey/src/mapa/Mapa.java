@@ -3,16 +3,16 @@ package mapa;
 import java.util.ArrayList;
 import java.util.List;
 
-import grafo.GrafoPesadoMapa;
+import grafo.GrafoPesado;
 
 public class Mapa {
 
-	private GrafoPesadoMapa _grafoMapa;
+	private GrafoPesado _grafoMapa;
 	private ArrayList<Coordenada> _coordenadas;
 	
 	public Mapa(List<Coordenada> listaCoordenadas){
 
-		_grafoMapa = new GrafoPesadoMapa(listaCoordenadas.size());
+		_grafoMapa = new GrafoPesado(listaCoordenadas.size());
 		for(int i=0; i<listaCoordenadas.size(); i++){
 			_coordenadas.add(listaCoordenadas.get(i));
 		}
