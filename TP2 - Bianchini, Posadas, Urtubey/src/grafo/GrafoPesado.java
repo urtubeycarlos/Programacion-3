@@ -1,5 +1,9 @@
 package grafo;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
+
 //FIXME: Para no romper el invariante de representacion habría que tener dos GrafoPesado en Mapa
 //FIXME: Uno para los peajes y otro para las distancias.
 
@@ -48,6 +52,22 @@ public class GrafoPesado extends Grafo {
 	public int getPeso(int i, int j){
 		chequearArista(i, j, "consultar el peso");
 		return _matrizPesos[i][j];
+	}
+	
+	//TODO: Implementar Dijsktra
+	public List<Integer> obtenerCaminoMinimo(int iOrigen, int jDestino){
+		List<Integer> ret = new ArrayList<Integer>();
+		PriorityQueue<Integer> cola = new PriorityQueue<Integer>();
+//		boolean[] visitados = new boolean[ getVertices() ];
+
+		int nodo_actual = iOrigen;
+		while( !ret.contains(jDestino) ){
+			
+			
+			
+		}
+		
+		return ret;
 	}
 	
 }
