@@ -26,4 +26,9 @@ public class GrafoPesadoTest {
 		assertEquals(11, _grafoPesado.getVertices());
 	}
 	
+	@Test
+	public void agregarArista(){
+		_grafoPesado.agregarArista(0, 1);
+		assertTrue(_grafoPesado.existeArista(0, 1));
+	}
 }

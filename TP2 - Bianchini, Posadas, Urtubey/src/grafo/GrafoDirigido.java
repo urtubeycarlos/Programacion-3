@@ -3,12 +3,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Grafo {
+public class GrafoDirigido {
 	// Representamos el grafo por medio de listas de vecinos
 	private ArrayList<HashSet<Integer>> _vecinos;
 
 	// El grafo se construye sin aristas. el indice es el vertice, el hashset son sus vecinos
-	public Grafo(int verticesIniciales){
+	public GrafoDirigido(int verticesIniciales){
 		_vecinos = new ArrayList<HashSet<Integer>>();
 		
 		for(int i=0; i<verticesIniciales; ++i)
@@ -20,7 +20,6 @@ public class Grafo {
 		chequearArista(i, j, "agregar");
 		
 		_vecinos.get(i).add(j);
-		_vecinos.get(j).add(i);
 	}
 	
 	// Como es un método para eliminar una arista?
@@ -28,7 +27,6 @@ public class Grafo {
 		chequearArista(i, j, "eliminar");
 		
 		_vecinos.get(i).remove(j);
-		_vecinos.get(j).remove(i);
 	}
 	
 	// Responde si existe una arista

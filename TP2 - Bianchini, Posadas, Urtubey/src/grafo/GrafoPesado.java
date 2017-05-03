@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 //FIXME: Para no romper el invariante de representacion habría que tener dos GrafoPesado en Mapa
 //FIXME: Uno para los peajes y otro para las distancias.
 
-public class GrafoPesado extends Grafo {
+public class GrafoPesado extends GrafoDirigido {
 	
 	private int[][] _matrizPesos;
 	
