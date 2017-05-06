@@ -40,8 +40,31 @@ public class Mapa {
 
 
 	//TODO: Calcular distancia en plano R2
-	private int calcularDistancia(Coordenada c1, Coordenada c2){
-		return 0;
+	private double calcularDistancia(Coordenada c1, Coordenada c2){
+//		c1.set_latitud(Math.toRadians(c1.getLatitud()));
+//		c1.set_longitud(Math.toRadians(c1.getLongitud()));
+//		
+//		c2.set_latitud(Math.toRadians(c2.getLatitud()));
+//		c2.set_longitud(Math.toRadians(c2.getLongitud()));
+		
+		double radio = 6378.137;
+		double distLong = c2.getLongitudEnRadianes() - c1.getLongitudEnRadianes();
+		double distanciaCoord = Math.acos(Math.sin(c1.getLatitudEnRadianes() * Math.sin(c2.getLatitudEnRadianes() + Math.cos(c1.getLatitudEnRadianes()) * Math.cos(c2.getLatitudEnRadianes() * Math.cos(distLong))))) * radio;
+		
+		//Sin adaptacion
+
+//			lat1 = Math.toRadians(lat1);
+//			long1 = Math.toRadians(long1);
+//			lat2 = Math.toRadians(lat2);
+//			long2 = Math.toRadians(long2);
+//			
+//			double radio = 6378.137;
+//			double distLong = long2 - long1;
+//			double distanciaCoord = Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(distLong)) * radio;
+//			
+//			//Metros. distanciaCoord * 0.621371192
+		
+		return distanciaCoord;
 	}
 
 	private void chequearCoordenada(Coordenada c, String accion){
