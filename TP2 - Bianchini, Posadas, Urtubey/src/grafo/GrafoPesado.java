@@ -105,6 +105,7 @@ public class GrafoPesado extends GrafoDirigido {
 	}
 	
 	
+	//FIXME: Borrar
 	public static void main(String[] args){
 		
 //		double[] distancias = new double[]{1.2, 5.0, 3.0, 7.0, 2.0};
