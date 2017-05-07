@@ -18,14 +18,12 @@ public class GrafoDirigido {
 	// Agregar una arista
 	public void agregarArista(int i, int j){
 		chequearArista(i, j, "agregar");
-		
 		_vecinos.get(i).add(j);
 	}
 	
 	// Como es un método para eliminar una arista?
 	public void eliminarArista(int i, int j){
 		chequearArista(i, j, "eliminar");
-		
 		_vecinos.get(i).remove(j);
 	}
 	
