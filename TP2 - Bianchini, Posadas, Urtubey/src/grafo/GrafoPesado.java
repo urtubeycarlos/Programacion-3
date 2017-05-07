@@ -1,9 +1,8 @@
 package grafo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.PriorityQueue;
 
 //FIXME: Para no romper el invariante de representacion habría que tener dos GrafoPesado en Mapa
 //FIXME: Uno para los peajes y otro para las distancias.
@@ -55,74 +54,82 @@ public class GrafoPesado extends GrafoDirigido {
 		return _matrizPesos[i][j];
 	}
 	
-	//FIXME: Esta mal :/
-	public Iterable<Integer> obtenerCaminoMinimo(int iOrigen, int jDestino){
+	
+	//TODO: Documentar
+	public List<Integer> obtenerCaminoMinimo(int origen, int destino){
+
+		double[] distancias = new double[ getVertices() ];
+		Arrays.fill(distancias, 1, distancias.length, Double.POSITIVE_INFINITY);
 		
 		boolean[] visitados = new boolean[ getVertices() ];
-		Camino ret = new Camino();
-		Camino caminoAux = new Camino();
-		PriorityQueue<Double> pesosActuales = new PriorityQueue<Double>();
-
-		int nodoActual = iOrigen;
-		HashMap<Double, Integer> aux = new HashMap<Double, Integer>();
-		// HashMap< ...pesos correspondiente a... ,  este vertice con el actual >
 		
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+	
+		int nodo_actual_i;
 		
-		while( !visitados[jDestino] ){
+		while ( !visitados[destino] ){
 			
-			for(int vecino:getVecinos(nodoActual)){
-				if( !visitados[vecino] ){
-					pesosActuales.add( getPeso(nodoActual, vecino) );
-					aux.put( getPeso(nodoActual, vecino), vecino );
-					visitados[vecino] = true;
-				}
-			}
+			nodo_actual_i = obtenerMenor(distancias, visitados);
+			visitados[nodo_actual_i] = true;
+			ret.add(nodo_actual_i);
+			
+			for( int nodo_j:getVecinos(nodo_actual_i)) if ( !visitados[nodo_j] ){
 				
-			double menorPeso = pesosActuales.peek();
-			caminoAux.agregarNodo(aux.get(menorPeso), menorPeso);;
+				double calculo_distancia = distancias[nodo_actual_i] + getPeso(nodo_actual_i, nodo_j);
+				if( calculo_distancia < distancias[nodo_j] ){
+					distancias[nodo_j] = calculo_distancia;
+				}
+				
+			}
 			
 			
 		}
-
-		return ret.getIterable();
+		
+		return ret;
+		
 	}
 	
-	private class Camino {
+	public int obtenerMenor(double[] distancias, boolean[] visitados){
 		
-		private ArrayList<Integer> _nodos;
-		private double _pesoAcum;
+		int res = -1;
+		double menor_actual = Double.POSITIVE_INFINITY;
 
-		public Camino(){
-			_nodos = new ArrayList<Integer>();
-			_pesoAcum = 0.0;
+		for( int i=0; i<distancias.length; i++ ) if ( !visitados[i] ){
+			if( distancias[i] < menor_actual ){
+				menor_actual = distancias[i];
+				res = i;
+			}
 		}
-		
-		private void agregarNodo(Integer nodo){
-			_nodos.add(nodo);
-		}
-		
-		public void agregarNodo(Integer nodo, double peso){
-			agregarNodo(nodo);
-			modificarPesoAcumulado(peso);
-		}
-		
-		private void modificarPesoAcumulado(double valor){
-			_pesoAcum += valor;
-		}
-		
-		public double getPesoAcumulado(){
-			return _pesoAcum;
-		}
-		
-		public Iterable<Integer> getIterable(){
-			return _nodos;
-		}
-		
+
+		return res;
 	}
+	
 	
 	public static void main(String[] args){
-		GrafoPesado g = new GrafoPesado(5);
-		g.obtenerCaminoMinimo(2, 3);
+		
+//		double[] distancias = new double[]{1.2, 5.0, 3.0, 7.0, 2.0};
+//		boolean[] visitados = new boolean[]{false, false, false, false, false};
+		
+		
+		GrafoPesado g = new GrafoPesado(6);
+		
+//		System.out.println( g.obtenerMenor(distancias, visitados) );
+		
+		g.agregarArista(0, 1, 10.0);
+		g.agregarArista(0, 2, 10.0);
+		g.agregarArista(0, 5, 1.0);
+		
+		g.agregarArista(1, 2, 10.0);
+		g.agregarArista(1, 4, 10.0);
+		
+		g.agregarArista(2, 3, 10.0);
+		g.agregarArista(2, 4, 10.0);
+		
+		g.agregarArista(4, 3, 1.0);
+		
+		g.agregarArista(5, 4, 1.0);
+		
+		System.out.println( g.obtenerCaminoMinimo(0, 3) );
 	}
 	
 }
