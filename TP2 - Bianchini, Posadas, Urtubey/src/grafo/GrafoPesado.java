@@ -58,15 +58,13 @@ public class GrafoPesado extends GrafoDirigido {
 	//TODO: Documentar
 	public List<Integer> obtenerCaminoMinimo(int origen, int destino){
 
-		double[] distancias = new double[ getVertices() ];
-		Arrays.fill(distancias, 1, distancias.length, Double.POSITIVE_INFINITY);
-		
-		boolean[] visitados = new boolean[ getVertices() ];
-		
-		ArrayList<Integer> ret = new ArrayList<Integer>();
-	
 		int nodo_actual_i;
-		
+		double[] distancias = new double[ getVertices() ];
+		boolean[] visitados = new boolean[ getVertices() ];
+		Arrays.fill(distancias, 1, distancias.length, Double.POSITIVE_INFINITY);
+
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+
 		while ( !visitados[destino] ){
 			
 			nodo_actual_i = obtenerMenor(distancias, visitados);
@@ -74,15 +72,13 @@ public class GrafoPesado extends GrafoDirigido {
 			ret.add(nodo_actual_i);
 			
 			for( int nodo_j:getVecinos(nodo_actual_i)) if ( !visitados[nodo_j] ){
-				
+
 				double calculo_distancia = distancias[nodo_actual_i] + getPeso(nodo_actual_i, nodo_j);
 				if( calculo_distancia < distancias[nodo_j] ){
 					distancias[nodo_j] = calculo_distancia;
 				}
 				
 			}
-			
-			
 		}
 		
 		return ret;
