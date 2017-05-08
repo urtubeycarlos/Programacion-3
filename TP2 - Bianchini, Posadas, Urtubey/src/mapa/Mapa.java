@@ -40,7 +40,7 @@ public class Mapa {
 
 
 	//TODO: Calcular distancia en plano R2
-	private double calcularDistancia(Coordenada c1, Coordenada c2){
+	public static double calcularDistancia(Coordenada c1, Coordenada c2){
 //		c1.set_latitud(Math.toRadians(c1.getLatitud()));
 //		c1.set_longitud(Math.toRadians(c1.getLongitud()));
 //		

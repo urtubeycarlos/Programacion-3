@@ -6,6 +6,11 @@ public class Coordenada {
 	private double _latitud;
 	private double _longitud;
 	
+	public Coordenada(){
+		_latitud = 0;
+		_longitud = 0;
+	}
+	
 	public Coordenada(String n, double lat, double lon){
 		_nombre = n;
 		_latitud = lat;
@@ -32,6 +37,10 @@ public class Coordenada {
 		return Math.toRadians(_longitud);
 	}
 	
+	public void setLatitudLongitud(double lat, double lon){
+		_latitud = lat;
+		_longitud = lon;
+	}
 	
 	@Override
 	public String toString(){
