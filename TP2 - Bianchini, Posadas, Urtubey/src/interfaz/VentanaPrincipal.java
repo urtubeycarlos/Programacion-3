@@ -19,11 +19,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Cursor;
+
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
 
 public class VentanaPrincipal {
 	
@@ -34,6 +38,7 @@ public class VentanaPrincipal {
 	Coordenada posicionActualMapa;
 	boolean agregandoPuntos;
 	boolean quitandoPuntos;
+	private final ButtonGroup botonesDelPanel = new ButtonGroup();
 	
 	/**
 	 * Launch the application.
@@ -72,22 +77,27 @@ public class VentanaPrincipal {
 		frame.getContentPane().setLayout(null);
 		
 		JButton btnAgregarPunto = new JButton("Agregar Puntos");
+		botonesDelPanel.add(btnAgregarPunto);
 		btnAgregarPunto.setBounds(24, 420, 150, 23);
 		frame.getContentPane().add(btnAgregarPunto);
 		
 		JButton btnQuitarPunto = new JButton("Quitar Puntos");
+		botonesDelPanel.add(btnQuitarPunto);
 		btnQuitarPunto.setBounds(24, 454, 150, 23);
 		frame.getContentPane().add(btnQuitarPunto);
 		
 		JButton btnAgregarRuta = new JButton("Conectar Puntos");
+		botonesDelPanel.add(btnAgregarRuta);
 		btnAgregarRuta.setBounds(24, 488, 150, 23);
 		frame.getContentPane().add(btnAgregarRuta);
 		
 		JButton btnNewButton = new JButton("Marcar inicio");
+		botonesDelPanel.add(btnNewButton);
 		btnNewButton.setBounds(284, 420, 150, 23);
 		frame.getContentPane().add(btnNewButton);
 		
 		JButton btnDestino = new JButton("Marcar destino");
+		botonesDelPanel.add(btnDestino);
 		btnDestino.setBounds(489, 420, 150, 23);
 		frame.getContentPane().add(btnDestino);
 		
@@ -100,14 +110,18 @@ public class VentanaPrincipal {
 		btnAgregarPunto.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (agregandoPuntos){
-					agregandoPuntos = false;
+				if (btnAgregarPunto.isSelected()){
+					btnAgregarPunto.setSelected(false);
 					btnAgregarPunto.setForeground(Color.BLACK);
 				}
 				else{
-					agregandoPuntos = true;
-					quitandoPuntos = false;
-					btnQuitarPunto.setForeground(Color.BLACK);
+					Enumeration<AbstractButton> botones = botonesDelPanel.getElements();
+					while (botones.hasMoreElements()){
+						JButton botonActual = (JButton) botones.nextElement();
+						botonActual.setSelected(false);
+						botonActual.setForeground(Color.BLACK);
+					}
+					btnAgregarPunto.setSelected(true);
 					btnAgregarPunto.setForeground(Color.BLUE);
 				}
 			}
@@ -116,17 +130,20 @@ public class VentanaPrincipal {
 		btnQuitarPunto.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (quitandoPuntos){
-					quitandoPuntos = false;
+				if (btnQuitarPunto.isSelected()){
+					btnQuitarPunto.setSelected(false);
 					btnQuitarPunto.setForeground(Color.BLACK);
 				}
 				else{
-					quitandoPuntos = true;
-					agregandoPuntos = false;
-					btnAgregarPunto.setForeground(Color.BLACK);
+					Enumeration<AbstractButton> botones = botonesDelPanel.getElements();
+					while (botones.hasMoreElements()){
+						JButton botonActual = (JButton) botones.nextElement();
+						botonActual.setSelected(false);
+						botonActual.setForeground(Color.BLACK);
+					}
+					btnQuitarPunto.setSelected(true);
 					btnQuitarPunto.setForeground(Color.BLUE);
 				}
-				
 			}
 		});
 		
@@ -144,10 +161,10 @@ public class VentanaPrincipal {
 			@Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
-                	if (agregandoPuntos){
+                	if (btnAgregarPunto.isSelected()){
                 		guardarCoordenadasSeleccionadas();
                 	}
-                	if (quitandoPuntos){
+                	if (btnQuitarPunto.isSelected()){
                 		eliminarCoordenadasSeleccionadas();
                 	}
                 }
@@ -161,7 +178,6 @@ public class VentanaPrincipal {
 	
 	private void guardarCoordenadasSeleccionadas(){
 		MapMarkerDot nuevoPunto = new MapMarkerDot(posicionActualMapa.getLatitud(), posicionActualMapa.getLongitud());
-		System.out.println(nuevoPunto.getLat());
 		map().addMapMarker(nuevoPunto);
 	}
 	
@@ -174,8 +190,10 @@ public class VentanaPrincipal {
 			if (estaSeleccionado(puntoSeleccionado)){
 				map().removeMapMarker(puntoSeleccionado);
 			}
-			
 		}
+	}
+	
+	private void seleccionarPuntoInicial(){
 		
 	}
 	
