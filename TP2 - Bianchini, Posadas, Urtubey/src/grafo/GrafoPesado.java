@@ -100,33 +100,4 @@ public class GrafoPesado extends GrafoDirigido {
 		return res;
 	}
 	
-	
-	//FIXME: Borrar
-	public static void main(String[] args){
-		
-//		double[] distancias = new double[]{1.2, 5.0, 3.0, 7.0, 2.0};
-//		boolean[] visitados = new boolean[]{false, false, false, false, false};
-		
-		
-		GrafoPesado g = new GrafoPesado(6);
-		
-//		System.out.println( g.obtenerMenor(distancias, visitados) );
-		
-		g.agregarArista(0, 1, 10.0);
-		g.agregarArista(0, 2, 10.0);
-		g.agregarArista(0, 5, 1.0);
-		
-		g.agregarArista(1, 2, 10.0);
-		g.agregarArista(1, 4, 10.0);
-		
-		g.agregarArista(2, 3, 10.0);
-		g.agregarArista(2, 4, 10.0);
-		
-		g.agregarArista(4, 3, 1.0);
-		
-		g.agregarArista(5, 4, 1.0);
-		
-		System.out.println( g.obtenerCaminoMinimo(0, 3) );
-	}
-	
 }
