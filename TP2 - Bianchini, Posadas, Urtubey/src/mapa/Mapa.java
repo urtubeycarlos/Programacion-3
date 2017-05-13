@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import grafo.GrafoPesado;
+import grafo.GrafoPesadoTest;
 
 public class Mapa {
 
@@ -26,21 +27,72 @@ public class Mapa {
 	}
 	
 	public void agregarRuta(Coordenada c1, Coordenada c2){
-		agregarRuta(c1, c2, 0);
+		agregarRuta(c1, c2, false);
 	}
 	
-	public void agregarRuta(Coordenada c1, Coordenada c2, int cantPeajes){
+	public void agregarRuta(Coordenada c1, Coordenada c2, boolean tienePeaje){
 		chequearCoordenada(c1, "agregar una ruta");
 		chequearCoordenada(c2, "agregar una ruta");
 		int iCoord1 = _coordenadas.indexOf(c1);
 		int iCoord2 = _coordenadas.indexOf(c2);
 		_grafoDistanciasMapa.agregarArista(iCoord1, iCoord2, calcularDistancia(c1, c2));
-		_grafoPeajesMapa.agregarArista(iCoord1, iCoord2, cantPeajes);
+		_grafoPeajesMapa.agregarArista(iCoord1, iCoord2, tienePeaje? 1:0);
 	}
 
+	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino){
+		return obtenerRutaOptima(origen, destino, 0);
+	}
+	
+	//TODO: Falta testear.
+	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino, int cant_max_peajes){
+		
+		List<Coordenada> ret = new ArrayList<Coordenada>();
+		GrafoPesado grafoConCapas = generarCopiaGrafoConCapas(_grafoDistanciasMapa, cant_max_peajes);
+		grafoConCapas = setearPeajesGrafo(grafoConCapas, _grafoPeajesMapa);
+		
+		List<Integer> indices_coordenadas = grafoConCapas.obtenerCaminoMinimo(_coordenadas.indexOf(origen), _coordenadas.indexOf(destino));
+		for(Integer indice:indices_coordenadas){
+			if( indice > _grafoDistanciasMapa.getVertices() )
+				indice = indice - _grafoDistanciasMapa.getVertices();
+			ret.add( _coordenadas.get(indice).clonar() );
+		}
+		
+		return ret;
+	}
 
-	//TODO: Calcular distancia en plano R2
-	public static double calcularDistancia(Coordenada c1, Coordenada c2){
+	//TODO: Falta testear.
+	private GrafoPesado generarCopiaGrafoConCapas(GrafoPesado grafo_original, int cant_capas){
+		
+		GrafoPesado ret = new GrafoPesado( grafo_original.getVertices()*cant_capas );
+		
+		for(int capa=1; capa<=cant_capas; capa++)
+		for(int vertice=0; vertice<=grafo_original.getVertices(); vertice++)
+		for(int vecino:grafo_original.getVecinos(vertice))
+				ret.agregarArista(vertice*capa, vecino*capa);
+		
+		return ret;
+	}
+	
+	//TODO: Falta testear.
+	private GrafoPesado setearPeajesGrafo(GrafoPesado grafo_en_capas, GrafoPesado grafo_peajes){
+		
+		int cant_capas = grafo_en_capas.getVertices()/grafo_peajes.getVertices();
+		
+		for(int capa=1; capa<cant_capas; capa++)
+		for(int vertice=0; vertice<=grafo_en_capas.getVertices(); vertice++)
+		for(int vecino:grafo_en_capas.getVecinos(vertice))
+			if( grafo_peajes.getPeso(vertice/capa, vecino/capa) > 0 ){
+				double peso_aux = grafo_en_capas.getPeso(vertice, vecino);
+				grafo_en_capas.eliminarArista(vertice, vecino);
+				grafo_en_capas.agregarArista(vertice, vecino+grafo_en_capas.getVertices(), peso_aux);
+			}
+		
+		return grafo_en_capas;
+		
+	}
+	
+	//FIXME: Hay que borrar los comentarios. Antes guardarlos en un bloc de notas por las dudas.
+	private double calcularDistancia(Coordenada c1, Coordenada c2){
 //		c1.set_latitud(Math.toRadians(c1.getLatitud()));
 //		c1.set_longitud(Math.toRadians(c1.getLongitud()));
 //		

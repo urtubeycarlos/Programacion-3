@@ -1,14 +1,18 @@
 package mapa;
 
-public class Coordenada {
+import java.io.Serializable;
 
+public class Coordenada implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private String _nombre;
 	private double _latitud;
 	private double _longitud;
 	
 	public Coordenada(){
-		_latitud = 0;
-		_longitud = 0;
+		_nombre = "";
+		_latitud = 0.0;
+		_longitud = 0.0;
 	}
 	
 	public Coordenada(String n, double lat, double lon){
@@ -37,9 +41,19 @@ public class Coordenada {
 		return Math.toRadians(_longitud);
 	}
 	
-	public void setLatitudLongitud(double lat, double lon){
-		_latitud = lat;
-		_longitud = lon;
+
+	public void setData(double latitud, double longitud){
+		setData("", latitud, longitud);
+	}
+	
+	public void setData(String nombre_nuevo, double latitud, double longitud){
+		_nombre = ( nombre_nuevo.equals("") )? _nombre:nombre_nuevo ;
+		_latitud = latitud;
+		_longitud = longitud;
+	}
+	
+	public Coordenada clonar(){
+		return new Coordenada(_nombre, _latitud, _longitud);
 	}
 	
 	@Override
@@ -51,7 +65,8 @@ public class Coordenada {
 	public boolean equals(Object o){
 		if ( !(o instanceof Coordenada) )
 			throw new IllegalArgumentException("El parametro ingresado no es una Coordenada");
-		return o.toString().equals(this.toString());
+		Coordenada coord2 = (Coordenada) o;
+		return _latitud == coord2.getLatitud() && _longitud == coord2.getLongitud();
 	}
 	
 }
