@@ -134,7 +134,7 @@ public class VentanaPrincipal {
             @Override
             public void mouseMoved(MouseEvent e) {
                 posicionActualFrame = e.getPoint();
-            	posicionActualMapa.setData(map().getPosition(posicionActualFrame).getLat(), map().getPosition(posicionActualFrame).getLon());
+                posicionActualMapa.setLatitudLongitud(map().getPosition(posicionActualFrame).getLat(), map().getPosition(posicionActualFrame).getLon());
                 //esto es alta magia
                 map().setToolTipText(map().getPosition(e.getPoint()).toString());
             }
