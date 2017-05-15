@@ -1,30 +1,27 @@
 package interfaz;
-import librerias.*;
 import mapa.Coordenada;
-import mapa.Mapa;
 
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.util.List;
 import java.awt.Point;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
+import org.junit.experimental.theories.Theories;
 import org.openstreetmap.gui.jmapviewer.*;
+import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
+import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
 
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.awt.event.ActionEvent;
-import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Color;
-import java.awt.Cursor;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -33,12 +30,11 @@ public class VentanaPrincipal {
 	
 	private JFrame frame;
 	private JMapViewerTree mapViewerTree;
-	private ArrayList<Double[]> puntosEnElMapa;
-	Point posicionActualFrame;
-	Coordenada posicionActualMapa;
-	boolean agregandoPuntos;
-	boolean quitandoPuntos;
 	private final ButtonGroup botonesDelPanel = new ButtonGroup();
+	
+	Point posicionActualFrame;
+	Coordinate posicionActualMapa;
+	ArrayList<MapMarker> puntosSeleccionados;
 	
 	/**
 	 * Launch the application.
@@ -67,9 +63,9 @@ public class VentanaPrincipal {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		puntosEnElMapa = new ArrayList<>();
 		posicionActualFrame = new Point();
-		posicionActualMapa = new Coordenada();
+		posicionActualMapa = new Coordinate(0, 0);
+		puntosSeleccionados = new ArrayList<>();
 				
 		frame = new JFrame();
 		frame.setBounds(100, 100, 970, 592);
@@ -91,17 +87,17 @@ public class VentanaPrincipal {
 		btnAgregarRuta.setBounds(24, 488, 150, 23);
 		frame.getContentPane().add(btnAgregarRuta);
 		
-		JButton btnNewButton = new JButton("Marcar inicio");
-		botonesDelPanel.add(btnNewButton);
-		btnNewButton.setBounds(284, 420, 150, 23);
-		frame.getContentPane().add(btnNewButton);
+		JButton btnInicio = new JButton("Marcar inicio");
+		botonesDelPanel.add(btnInicio);
+		btnInicio.setBounds(284, 420, 150, 23);
+		frame.getContentPane().add(btnInicio);
 		
 		JButton btnDestino = new JButton("Marcar destino");
 		botonesDelPanel.add(btnDestino);
 		btnDestino.setBounds(489, 420, 150, 23);
 		frame.getContentPane().add(btnDestino);
 		
-		//Se inicializa el mapa
+		//Se inicializa el Jmap
 		mapViewerTree = new JMapViewerTree("Zones");
 		mapViewerTree.setBounds(10, 10, 930, 400);
 		frame.getContentPane().add(mapViewerTree);
@@ -110,48 +106,34 @@ public class VentanaPrincipal {
 		btnAgregarPunto.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (btnAgregarPunto.isSelected()){
-					btnAgregarPunto.setSelected(false);
-					btnAgregarPunto.setForeground(Color.BLACK);
-				}
-				else{
-					Enumeration<AbstractButton> botones = botonesDelPanel.getElements();
-					while (botones.hasMoreElements()){
-						JButton botonActual = (JButton) botones.nextElement();
-						botonActual.setSelected(false);
-						botonActual.setForeground(Color.BLACK);
-					}
-					btnAgregarPunto.setSelected(true);
-					btnAgregarPunto.setForeground(Color.BLUE);
-				}
+				myActionPerformed(e, btnAgregarPunto);
 			}
 		});
-		
 		btnQuitarPunto.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (btnQuitarPunto.isSelected()){
-					btnQuitarPunto.setSelected(false);
-					btnQuitarPunto.setForeground(Color.BLACK);
-				}
-				else{
-					Enumeration<AbstractButton> botones = botonesDelPanel.getElements();
-					while (botones.hasMoreElements()){
-						JButton botonActual = (JButton) botones.nextElement();
-						botonActual.setSelected(false);
-						botonActual.setForeground(Color.BLACK);
-					}
-					btnQuitarPunto.setSelected(true);
-					btnQuitarPunto.setForeground(Color.BLUE);
-				}
+				myActionPerformed(e, btnQuitarPunto);
+			}
+		});
+		btnAgregarRuta.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e){
+				myActionPerformed(e, btnAgregarRuta);
+			}
+		});
+		btnInicio.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				myActionPerformed(e, btnInicio);
 			}
 		});
 		
+		// Mouse listeners
 		map().addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
                 posicionActualFrame = e.getPoint();
-                posicionActualMapa.setData(map().getPosition(posicionActualFrame).getLat(), map().getPosition(posicionActualFrame).getLon());
+                posicionActualMapa = map().getPosition(posicionActualFrame);
                 //esto es alta magia
                 map().setToolTipText(map().getPosition(e.getPoint()).toString());
             }
@@ -162,47 +144,133 @@ public class VentanaPrincipal {
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
                 	if (btnAgregarPunto.isSelected()){
-                		guardarCoordenadasSeleccionadas();
+                		agregarPunto();
                 	}
                 	if (btnQuitarPunto.isSelected()){
-                		eliminarCoordenadasSeleccionadas();
+                		eliminarPunto();
                 	}
+                	escucharSeleccionDePuntos(btnAgregarRuta, btnInicio);
                 }
             }
         });
 	}
 	
+	/**
+	 * Generaliza el actionPerformed de los botones
+	 */
+	public void myActionPerformed(ActionEvent action, JButton button) {
+		if (button.isSelected()){
+			button.setSelected(false);
+			button.setForeground(Color.BLACK);
+			deseleccionarPuntos();
+		}
+		else{
+			deseleccionarBotones();
+			button.setSelected(true);
+			button.setForeground(Color.BLUE);
+		}
+	}
+	
+	/**
+	 *  Jmap getter. devuelve el visor del mapa con todos sus metodos
+	 */
 	private JMapViewer map() {
         return mapViewerTree.getViewer();
     }
 	
-	private void guardarCoordenadasSeleccionadas(){
-		MapMarkerDot nuevoPunto = new MapMarkerDot(posicionActualMapa.getLatitud(), posicionActualMapa.getLongitud());
+	/**
+	 * Se añade al mapa un punto nuevo
+	 */
+	private void agregarPunto(){
+		MapMarkerDot nuevoPunto = new MapMarkerDot(posicionActualMapa);
+		nuevoPunto.setBackColor(Color.BLUE);
 		map().addMapMarker(nuevoPunto);
 	}
 	
-	private void eliminarCoordenadasSeleccionadas(){
+	/**
+	 * Si el boton quitar puntos esta seleccionado, cada vez que se hace click en un punto
+	 * este se borra junto con las aristas que salen de el.
+	 */
+	private void eliminarPunto(){
 		List<MapMarker> listaDePuntosDelMapa = map().getMapMarkerList();
+		List<MapPolygon> listaDePoligonosDelMapa = map().getMapPolygonList();
 		
-		for (int punto=0;punto<listaDePuntosDelMapa.size();punto++){
-			MapMarker puntoSeleccionado = listaDePuntosDelMapa.get(punto);
-			
-			if (estaSeleccionado(puntoSeleccionado)){
-				map().removeMapMarker(puntoSeleccionado);
+		ArrayList<MapMarker> listaDePuntosAQuitar = new ArrayList<>();
+		ArrayList<MapPolygon> listaDePoligonosAQuitar = new ArrayList<>();
+		for (MapMarker punto: listaDePuntosDelMapa){
+			if (fueClickeado(punto)){
+				listaDePuntosAQuitar.add(punto);
+				for (MapPolygon polygon: listaDePoligonosDelMapa)
+					for (ICoordinate coordinate : polygon.getPoints())
+						if (punto.getCoordinate().equals(coordinate))
+							listaDePoligonosAQuitar.add(polygon);
 			}
+		}
+		for (MapPolygon polygon: listaDePoligonosAQuitar){
+			map().removeMapPolygon(polygon);
+		}
+		for (MapMarker punto: listaDePuntosAQuitar){
+			map().removeMapMarker(punto);
 		}
 	}
 	
-	private void seleccionarPuntoInicial(){
-		
+	private void deseleccionarBotones() {
+		Enumeration<AbstractButton> botones = botonesDelPanel.getElements();
+		while (botones.hasMoreElements()){
+			JButton botonActual = (JButton) botones.nextElement();
+			botonActual.setSelected(false);
+			botonActual.setForeground(Color.BLACK);
+		}
 	}
 	
+	private void escucharSeleccionDePuntos(JButton agregarRuta, JButton agregarInicio){
+		if (agregarRuta.isSelected()){
+			agregandoSeleccion();
+		}
+		else{
+			deseleccionarPuntos();
+		}
+		if (agregarInicio.isSelected()){
+			//TODO: hacer la seleccion de inicio de los puntos.
+		}
+	}
+
+	/**
+	 * Este metodo agrega puntos a la seleccion de ruta. Cuando esta se completa,
+	 * dibuja una linea entre ellos.
+	 */
+	private void agregandoSeleccion() {
+		List<MapMarker> listaDePuntosDelMapa = map().getMapMarkerList();
+		for (MapMarker punto: listaDePuntosDelMapa){
+
+			if (fueClickeado(punto) && !puntosSeleccionados.contains(punto))
+				this.puntosSeleccionados.add(punto);
+			}
+			if (this.puntosSeleccionados.size()>=2){
+				dibujarLineaEntrePuntosSeleccionados();
+				deseleccionarPuntos();
+			}
+	}
+
+	private void dibujarLineaEntrePuntosSeleccionados() {
+		Coordinate inicio = this.puntosSeleccionados.get(0).getCoordinate();
+		Coordinate destino = this.puntosSeleccionados.get(1).getCoordinate();
+		List<Coordinate> ruta = new ArrayList<Coordinate>(Arrays.asList(inicio, destino, destino));
+		map().addMapPolygon(new MapPolygonImpl(ruta));
+		
+	}
+
+	private void deseleccionarPuntos() {
+		if (this.puntosSeleccionados != null)
+			this.puntosSeleccionados.clear();
+	}
+		
 	/**
 	 * Este metodo chequea si un punto marcado en el mapa esta siendo clickeado por el mouse.
 	 * @param punto Es un MapMarker proveniente del JMapViewer
 	 * @return boolean
 	 */
-	private boolean estaSeleccionado(MapMarker punto){
+	private boolean fueClickeado(MapMarker punto){
 		/*
 		 * La funcion toma la coordenada del JFrame del mouse, y calcula un punto ficticio alrededor del mismo
 		 * al cual se le llama tolerancia. Este se obtiene de sumarle a la coordenada del mouse el radio del
@@ -210,7 +278,6 @@ public class VentanaPrincipal {
 		 * estos puntos al mapa para que este devuelva las coordenadas reales. Luego se calcula distancia entre
 		 * mouse, tolerancia y punto utilizando Pitagoras.
 		 */
-
 		
 		// Coordenadas JFrame
 		int toleranciaXFrame = (int)(posicionActualFrame.getX()+punto.getRadius());
@@ -219,25 +286,21 @@ public class VentanaPrincipal {
 		Point toleranciaMouse = new Point(toleranciaXFrame, toleranciaYFrame);
 		
 		// Coordenadas JMap
-		Coordinate bordeDelMouseMapa = map().getPosition(toleranciaMouse);
-		
-		// Coordenadas finales 
-		Coordenada centroDelMouse = posicionActualMapa;
-		Coordenada bordeDelMouse = new Coordenada("", bordeDelMouseMapa.getLat(), bordeDelMouseMapa.getLon());
-		Coordenada coordenadaPunto = new Coordenada("", punto.getLat(), punto.getLon());
+		Coordinate bordeDelMouse = map().getPosition(toleranciaMouse);
+		Coordinate centroDelMouse = posicionActualMapa;
 		
 		// Distancia entre mouse y tolerancia
-		Double dx = centroDelMouse.getLatitud() - bordeDelMouse.getLatitud();
-		Double dy = centroDelMouse.getLongitud() - bordeDelMouse.getLongitud();
-		final Double radioMouse = Math.sqrt((dx*dx)+(dy*dy));
+		Double dx = centroDelMouse.getLat() - bordeDelMouse.getLat();
+		Double dy = centroDelMouse.getLon() - bordeDelMouse.getLon();
+		final Double radioToleranciaMouse = Math.sqrt((dx*dx)+(dy*dy));
 		
 		// Distancia entre mouse y punto
-		dx = centroDelMouse.getLatitud() - punto.getLat();
-		dy = centroDelMouse.getLongitud() - punto.getLon();
+		dx = centroDelMouse.getLat() - punto.getLat();
+		dy = centroDelMouse.getLon() - punto.getLon();
 		final Double distanciaMousePunto = Math.sqrt((dx*dx)+(dy*dy));
 		
 		// La Verdad
-		if (distanciaMousePunto<=radioMouse)
+		if (distanciaMousePunto<=radioToleranciaMouse)
             return true;
         return false;
 		
