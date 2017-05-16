@@ -77,8 +77,6 @@ public class MapaRutas implements Mapa {
 	@Override
 	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino, int cantPeajesMax) {
 
-		//Bloque del bien
-		
 		List<Coordenada> ret = new ArrayList<Coordenada>();
 		ArrayList<Coordenada> referenciasCoordenadas = new ArrayList<Coordenada>();
 		GrafoPesadoUnidireccional<Integer> grafoEnCapas = new GrafoPesadoUnidireccional<>();
