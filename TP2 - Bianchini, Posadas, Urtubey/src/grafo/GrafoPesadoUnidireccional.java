@@ -78,7 +78,7 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 			visitados.add(nodo_actual);
 			camino_actual.add(nodo_actual);
 
-			for( E nodo_j:super.getVecinos(nodo_actual) ) if( !visitados.contains(nodo_j) && nodo_j != null){
+			for( E nodo_j:super.getVecinos(nodo_actual) ) if( nodo_j != null && !visitados.contains(nodo_j) ){
 				Double calc_distancia = distancias.get(nodo_actual) + getPeso(nodo_actual, nodo_j);
 				if ( calc_distancia < distancias.get(nodo_j) ){
 					distancias.put(nodo_j, calc_distancia);

@@ -120,7 +120,7 @@ public class MapaRutas implements Mapa {
 					grafoEnCapas.agregarArista( vertice - i*_grafoCiudades.cantVertices() , vecino);
 				}
 
-		List<Integer> res = grafoEnCapas.obtenerCaminoMinimo( referenciasCoordenadas.indexOf(origen) , referenciasCoordenadas.indexOf(destino) );
+		List<Integer> res = grafoEnCapas.obtenerCaminoMinimo( referenciasCoordenadas.indexOf(origen) , referenciasCoordenadas.indexOf(destino) + referenciasCoordenadas.indexOf(destino)*cantPeajesMax );
 		
 		for(Integer indice:res)
 			ret.add( referenciasCoordenadas.get(indice) );
