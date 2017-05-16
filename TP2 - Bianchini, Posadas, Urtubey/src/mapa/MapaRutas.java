@@ -39,9 +39,23 @@ public class MapaRutas implements Mapa {
 		if( indC1 > _matrizPeajes.width() || indC2 > _matrizPeajes.height() )
 			_matrizPeajes.resize( _matrizPeajes.width()*2 , _matrizPeajes.height()*2);
 		
-		_grafoCiudades.agregarArista(indC1, indC2);
-		if( tienePeaje ) 
-			_matrizPeajes.set(indC1, indC2, true);
+		_grafoCiudades.agregarArista(indC1, indC2, calcularDistancia(c1, c2));
+		_matrizPeajes.set(indC1, indC2, tienePeaje);
+	}
+	
+	private double calcularDistancia(Coordenada c1, Coordenada c2){
+		
+		double lat1 = c1.getLatitudEnRadianes();
+		double long1 = c1.getLongitudEnRadianes();
+		double lat2 = c2.getLatitudEnRadianes();
+		double long2 = c2.getLongitudEnRadianes();
+		
+		double radio = 6378.137;
+		double distLong = long2 - long1;
+		double distanciaCoord = Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(distLong)) * radio;
+		
+		return (distanciaCoord * 0.621371192);
+		
 	}
 	
 	@Override
@@ -92,21 +106,20 @@ public class MapaRutas implements Mapa {
 			grafoEnCapas.agregarVertice(vertice);
 		
 		
-		for( int i=0; i<cantPeajesMax; i++ ){
-			for( int vertice:_grafoCiudades.getVertices() )
-			for( int vecino:_grafoCiudades.getVecinos(vertice) )
-				grafoEnCapas.agregarArista(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices());
-		}
+		for( int i=0; i<cantPeajesMax; i++ )
+		for( int vertice:_grafoCiudades.getVertices() )
+		for( int vecino:_grafoCiudades.getVecinos(vertice) )
+			grafoEnCapas.agregarArista(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _grafoCiudades.getPeso(vertice, vecino));
+
 		
-		for( int i=0; i<cantPeajesMax; i++ ){
-			for( int vertice:grafoEnCapas.getVertices() )
-			for( int vecino:grafoEnCapas.getVecinos(vertice) )
+		for( int i=0; i<cantPeajesMax; i++ )
+		for( int vertice:grafoEnCapas.getVertices() )
+		for( int vecino:grafoEnCapas.getVecinos(vertice) ) 
 				if( _matrizPeajes.get(vertice - i*_grafoCiudades.cantVertices(), vecino - i*_grafoCiudades.cantVertices()) ){
 					grafoEnCapas.eliminarArista(vertice - i*_grafoCiudades.cantVertices(), vecino - i*_grafoCiudades.cantVertices());
 					grafoEnCapas.agregarArista( vertice - i*_grafoCiudades.cantVertices() , vecino);
 				}
-		}
-		
+
 		List<Integer> res = grafoEnCapas.obtenerCaminoMinimo( referenciasCoordenadas.indexOf(origen) , referenciasCoordenadas.indexOf(destino) );
 		
 		for(Integer indice:res)

@@ -3,7 +3,6 @@ package tests;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,63 +12,59 @@ import mapa.MapaRutas;
 
 public class MapaTest {
 
-	MapaRutas m;
+	private MapaRutas m;
+	private Coordenada[] coordenadas;
 	
 	@Before
 	public void inicializar() {
+		
 		m = new MapaRutas();
+		
+		coordenadas = new Coordenada[]{
+				new Coordenada("Springfield", 510.0, 213.0), 
+				new Coordenada("Shelbyville", 310.0, 220.0), 
+				new Coordenada("Ciudad Gritos", 666.0, 123.0)
+		};
+		
+		m.agregarCoordenadas( Arrays.asList(coordenadas) );
+		
+		m.agregarRuta(coordenadas[0], coordenadas[1], false);
+		m.agregarRuta(coordenadas[1], coordenadas[2], false);
+		m.agregarRuta(coordenadas[0], coordenadas[2], true);
+	
 	}
 
 	@Test
 	public void agregarCoordenadaTest() {
-		Coordenada c = new Coordenada("Springfield", 200.5, 200.5);
-		m.agregarCoordenada(c);
-		assertEquals(1, m.getCoordenadas().size());
+		assertEquals(3, m.getCoordenadas().size());
 	}
 	
 	@Test
 	public void agregarCoordenadasTest() {
-		Coordenada[] coordenadas = new Coordenada[]{
-				new Coordenada("Springfield", 510.0, 213.0), 
-				new Coordenada("Shelbyville", -510, -213), 
-				new Coordenada("Ciudad Gritos", 666, 123)
-		};
-		m.agregarCoordenadas( Arrays.asList(coordenadas) );
 		assertEquals(3, m.getCoordenadas().size() );
 	}
 
-	
-
 	@Test
 	public void agregarRuta() {
-		
-		Coordenada c1 = new Coordenada("Springfield", 510.0, 213.0); 
-		Coordenada c2 = new Coordenada("Shelbyville", -510, -213);
-		m.agregarCoordenada(c1);
-		m.agregarCoordenada(c2);
-		m.agregarRuta(c1, c2, true);
-		assertTrue( m.existeRuta(c1, c2) );
-		assertFalse( m.existeRuta(c2, c1) );
-		
+		assertTrue( m.existeRuta(coordenadas[0], coordenadas[1]) );
+		assertFalse( m.existeRuta(coordenadas[1], coordenadas[0]) );
 	}
 
+	
 	@Test
 	public void getCoordenadas() {
-		
+		assertEquals( Arrays.asList(coordenadas), m.getCoordenadas() );
 	}
 
 	@Test
 	public void cantPeajes() {
+		assertEquals(new Integer(1), m.cantPeajes());
 	}
 
 	@Test
 	public void obtenerRutaOptimaTest() {
-		Coordenada[] coordenadas = new Coordenada[]{
-				new Coordenada("Springfield", 510.0, 213.0), 
-				new Coordenada("Shelbyville", -510, -213), 
-				new Coordenada("Ciudad Gritos", 666, 123)
-		};
-		m.agregarCoordenadas( Arrays.asList(coordenadas) );
+		System.out.println( m.obtenerRutaOptima(coordenadas[0], coordenadas[2], 0) );
 	}
+	
 
 }
