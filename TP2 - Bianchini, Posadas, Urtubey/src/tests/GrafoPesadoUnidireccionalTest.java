@@ -8,26 +8,67 @@ import grafo.GrafoPesadoUnidireccional;
 
 public class GrafoPesadoUnidireccionalTest {
 
-	GrafoPesadoUnidireccional<Integer> g;
+	GrafoPesadoUnidireccional<Integer> _grafo;
 	
 	@Test
-	public void inicializar(){
-		g = new GrafoPesadoUnidireccional<Integer>();
-		g.agregarVertice(1);
-		g.agregarVertice(2);
-		g.agregarVertice(3);
+	public void agregarVerticeTest(){
+		_grafo = new GrafoPesadoUnidireccional<Integer>();
+		_grafo.agregarVertice(1);
+		assertEquals(1, _grafo.cantVertices());
+	}
+
+	@Test
+	public void eliminarVerticeTest(){
 		
-		g.agregarArista(1, 2, 6.0);
-		g.agregarArista(2, 3, 5.0);
-		g.agregarArista(1, 3, 7.0);
+	}
+	
+	@Test
+	public void agregarAristaTest(){
+		_grafo = new GrafoPesadoUnidireccional<Integer>();
 		
-		System.out.println(g.obtenerCaminoMinimo(1, 3) );
+		_grafo.agregarVertice(0);
+		_grafo.agregarVertice(1);
+		
+		assertTrue(_grafo.agregarArista(0, 1));
+	}
+	
+	@Test
+	public void agregarAristaPesadaTest(){
+		_grafo = new GrafoPesadoUnidireccional<Integer>();
+		
+		_grafo.agregarVertice(0);
+		_grafo.agregarVertice(1);
+		
+		assertTrue(_grafo.agregarArista(0, 1, 3.0));
+	}
+	
+	@Test
+	public void getPeso(){
+		_grafo = new GrafoPesadoUnidireccional<Integer>();
+		
+		_grafo.agregarVertice(0);
+		_grafo.agregarVertice(1);
+		
+		_grafo.agregarArista(0, 1, 3.0);
+		assertEquals(3.0,_grafo.getPeso(0, 1), 0.0001);
+	}
+	
+	@Test
+	public void obtenerCaminoMinimoTest(){
+		
 	}
 	
 	@Test
 	public void distanciaMinimaUnElementoTest(){
-		g = new GrafoPesadoUnidireccional<Integer>();
-		g.agregarVertice(1);
+		_grafo = new GrafoPesadoUnidireccional<Integer>();
+		_grafo.agregarVertice(0);
+		_grafo.agregarVertice(1);
+		_grafo.agregarVertice(2);
+		
+		_grafo.agregarArista(0, 1, 3.0);
+		_grafo.agregarArista(0, 2, 5.0);	
+		_grafo.agregarArista(1, 2, 3.0);
+		
 	}
 	
 
