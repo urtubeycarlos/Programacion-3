@@ -3,124 +3,114 @@ package mapa;
 import java.util.ArrayList;
 import java.util.List;
 
-import grafo.GrafoPesado;
+import grafo.GrafoPesadoUnidireccional;
+import matriz.MatrizCartesiana;
 
 public class MapaRutas implements Mapa {
 
-	private GrafoPesado _grafoDistanciasMapa;
-	private GrafoPesado _grafoPeajesMapa;
-	private ArrayList<Coordenada> _coordenadas;
-	
-	public MapaRutas(List<Coordenada> listaCoordenadas){
+	private GrafoPesadoUnidireccional<Integer> _grafoCiudades;
+	private MatrizCartesiana<Boolean> _matrizPeajes;
+	ArrayList<Coordenada> _listaCoordenadas;
 
-		_grafoDistanciasMapa = new GrafoPesado(listaCoordenadas.size());
-		_grafoPeajesMapa = new GrafoPesado(listaCoordenadas.size());
-		for(int i=0; i<listaCoordenadas.size(); i++){
-			_coordenadas.add(listaCoordenadas.get(i));
-		}
-	
+	public MapaRutas(){
+		_grafoCiudades = new GrafoPesadoUnidireccional<Integer>();
+		_matrizPeajes = new MatrizCartesiana<Boolean>(16, 16);
+		_listaCoordenadas = new ArrayList<Coordenada>();
 	}
 	
-	public Iterable<Coordenada> getCoordenadas(){
-		return _coordenadas;
-	}
-	
-	public void agregarRuta(Coordenada c1, Coordenada c2){
-		agregarRuta(c1, c2, false);
-	}
-	
-	public void agregarRuta(Coordenada c1, Coordenada c2, boolean tienePeaje){
-		chequearCoordenada(c1, "agregar una ruta");
-		chequearCoordenada(c2, "agregar una ruta");
-		int iCoord1 = _coordenadas.indexOf(c1);
-		int iCoord2 = _coordenadas.indexOf(c2);
-		_grafoDistanciasMapa.agregarArista(iCoord1, iCoord2, calcularDistancia(c1, c2));
-		_grafoPeajesMapa.agregarArista(iCoord1, iCoord2, tienePeaje? 1:0);
+	@Override
+	public boolean agregarCoordenada(Coordenada c) {
+		if( !_listaCoordenadas.contains(c) )
+			_listaCoordenadas.add(c);
+		boolean acum = true;
+		acum = acum && _grafoCiudades.agregarVertice( _listaCoordenadas.indexOf(c) );
+		return acum;
 	}
 
-	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino){
-		return obtenerRutaOptima(origen, destino, 0);
+	@Override
+	public boolean agregarCoordenadas(Iterable<Coordenada> coordenadas) {
+		boolean acum = true;
+		for( Coordenada c:coordenadas )
+			acum = acum && agregarCoordenada(c);
+		return acum;
 	}
-	
-	//TODO: Falta testear.
-	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino, int cant_max_peajes){
+
+	@Override
+	public boolean agregarRuta(Coordenada c1, Coordenada c2, boolean tienePeaje) {
+		Integer indC1 = _listaCoordenadas.indexOf(c1);
+		Integer indC2 = _listaCoordenadas.indexOf(c2);
+		
+		if( indC1 > _matrizPeajes.width() || indC2 > _matrizPeajes.height() )
+			_matrizPeajes.resize( _matrizPeajes.width()*2 , _matrizPeajes.height()*2);
+		
+		return _grafoCiudades.agregarArista(indC1, indC2) && ( tienePeaje? _matrizPeajes.set(indC1, indC2, true):true );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Coordenada> getCoordenadas() {
+		return ( List<Coordenada> ) _listaCoordenadas.clone();
+	}
+
+	@Override
+	public Integer cantPeajes() {
+		Integer cont = 0;
+		for( Integer vertice:_grafoCiudades.getVertices() )
+		for( Integer vecino:_grafoCiudades.getVecinos(vertice) )
+			if( _matrizPeajes.get(vertice, vecino) )
+				cont++;
+		return cont;
+
+	}
+
+	@Override
+	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino) {
+		List<Coordenada> ret = new ArrayList<Coordenada>();
+		Integer indOrigen = _listaCoordenadas.indexOf(origen);
+		Integer indDestino = _listaCoordenadas.indexOf(destino);
+		List<Integer> res = _grafoCiudades.obtenerCaminoMinimo(indOrigen, indDestino);
+		for(Integer indice:res)
+			ret.add( _listaCoordenadas.get(indice) );
+		return ret;
+		
+	}
+
+	@Override
+	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino, int cantPeajesMax) {
+
+		//Bloque del bien
 		
 		List<Coordenada> ret = new ArrayList<Coordenada>();
-		GrafoPesado grafoConCapas = generarCopiaGrafoConCapas(_grafoDistanciasMapa, cant_max_peajes);
-		grafoConCapas = setearPeajesGrafo(grafoConCapas, _grafoPeajesMapa);
+		ArrayList<Coordenada> referenciasCoordenadas = new ArrayList<Coordenada>();
+		GrafoPesadoUnidireccional<Integer> grafoEnCapas = new GrafoPesadoUnidireccional<>();
 		
-		List<Integer> indices_coordenadas = grafoConCapas.obtenerCaminoMinimo(_coordenadas.indexOf(origen), _coordenadas.indexOf(destino));
-		for(Integer indice:indices_coordenadas){
-			if( indice > _grafoDistanciasMapa.getVertices() )
-				indice = indice - _grafoDistanciasMapa.getVertices();
-			ret.add( _coordenadas.get(indice).clonar() );
+		for( int i=0; i<=cantPeajesMax; i++ )
+			referenciasCoordenadas.addAll( _listaCoordenadas );
+
+		for( Integer vertice=0; vertice<referenciasCoordenadas.size(); vertice++ )
+			grafoEnCapas.agregarVertice(vertice);
+		
+		
+		for( int i=0; i<cantPeajesMax; i++ ){
+			for( int vertice:_grafoCiudades.getVertices() )
+			for( int vecino:_grafoCiudades.getVecinos(vertice) )
+				grafoEnCapas.agregarArista(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices());
 		}
 		
+		for( int i=0; i<cantPeajesMax; i++ ){
+			for( int vertice:grafoEnCapas.getVertices() )
+			for( int vecino:grafoEnCapas.getVecinos(vertice) )
+				if( _matrizPeajes.get(vertice - i*_grafoCiudades.cantVertices(), vecino - i*_grafoCiudades.cantVertices()) ){
+					grafoEnCapas.eliminarArista(vertice - i*_grafoCiudades.cantVertices(), vecino - i*_grafoCiudades.cantVertices());
+					grafoEnCapas.agregarArista( vertice - i*_grafoCiudades.cantVertices() , vecino);
+				}
+		}
+		
+		List<Integer> res = grafoEnCapas.obtenerCaminoMinimo( referenciasCoordenadas.indexOf(origen) , referenciasCoordenadas.indexOf(destino) );
+		
+		for(Integer indice:res)
+			ret.add( referenciasCoordenadas.get(indice) );
 		return ret;
-	}
-
-	//TODO: Falta testear.
-	private GrafoPesado generarCopiaGrafoConCapas(GrafoPesado grafo_original, int cant_capas){
-		
-		GrafoPesado ret = new GrafoPesado( grafo_original.getVertices()*cant_capas );
-		
-		for(int capa=1; capa<=cant_capas; capa++)
-		for(int vertice=0; vertice<=grafo_original.getVertices(); vertice++)
-		for(int vecino:grafo_original.getVecinos(vertice))
-				ret.agregarArista(vertice*capa, vecino*capa);
-		
-		return ret;
-	}
-	
-	//TODO: Falta testear.
-	private GrafoPesado setearPeajesGrafo(GrafoPesado grafo_en_capas, GrafoPesado grafo_peajes){
-		
-		int cant_capas = grafo_en_capas.getVertices()/grafo_peajes.getVertices();
-		
-		for(int capa=1; capa<cant_capas; capa++)
-		for(int vertice=0; vertice<=grafo_en_capas.getVertices(); vertice++)
-		for(int vecino:grafo_en_capas.getVecinos(vertice))
-			if( grafo_peajes.getPeso(vertice/capa, vecino/capa) > 0 ){
-				double peso_aux = grafo_en_capas.getPeso(vertice, vecino);
-				grafo_en_capas.eliminarArista(vertice, vecino);
-				grafo_en_capas.agregarArista(vertice, vecino+grafo_en_capas.getVertices(), peso_aux);
-			}
-		
-		return grafo_en_capas;
-		
-	}
-	
-	//FIXME: Hay que borrar los comentarios. Antes guardarlos en un bloc de notas por las dudas.
-	private double calcularDistancia(Coordenada c1, Coordenada c2){
-//		c1.set_latitud(Math.toRadians(c1.getLatitud()));
-//		c1.set_longitud(Math.toRadians(c1.getLongitud()));
-//		
-//		c2.set_latitud(Math.toRadians(c2.getLatitud()));
-//		c2.set_longitud(Math.toRadians(c2.getLongitud()));
-		
-		double radio = 6378.137;
-		double distLong = c2.getLongitudEnRadianes() - c1.getLongitudEnRadianes();
-		double distanciaCoord = Math.acos(Math.sin(c1.getLatitudEnRadianes() * Math.sin(c2.getLatitudEnRadianes() + Math.cos(c1.getLatitudEnRadianes()) * Math.cos(c2.getLatitudEnRadianes() * Math.cos(distLong))))) * radio;
-		
-		//Sin adaptacion
-
-//			lat1 = Math.toRadians(lat1);
-//			long1 = Math.toRadians(long1);
-//			lat2 = Math.toRadians(lat2);
-//			long2 = Math.toRadians(long2);
-//			
-//			double radio = 6378.137;
-//			double distLong = long2 - long1;
-//			double distanciaCoord = Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(distLong)) * radio;
-//			
-//			//Metros. distanciaCoord * 0.621371192
-		
-		return distanciaCoord;
-	}
-
-	private void chequearCoordenada(Coordenada c, String accion){
-		if( !_coordenadas.contains(c) )
-			throw new IllegalArgumentException("Se intento " + accion + " con una coordenada inexistente");
 	}
 	
 }
