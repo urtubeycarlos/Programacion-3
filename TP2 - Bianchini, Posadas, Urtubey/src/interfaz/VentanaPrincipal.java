@@ -5,6 +5,7 @@ import mapa.Mapa;
 import java.awt.EventQueue;
 import java.util.List;
 import java.awt.Point;
+import java.awt.Polygon;
 
 import javax.swing.JFrame;
 
@@ -27,8 +28,11 @@ import java.awt.Color;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.JLabel;
 import java.awt.Font;
+import javax.swing.JCheckBox;
 
 public class VentanaPrincipal {
 	
@@ -39,9 +43,12 @@ public class VentanaPrincipal {
 	Point posicionActualFrame;
 	Coordinate posicionActualMapa;
 	ArrayList<MapMarker> puntosSeleccionados;
+	List<MapMarker> listaDePuntosDelMapa;
+	List<MapPolygon> listaDePoligonosDelMapa;
+	boolean peaje = false;
 	
 	// Trabajamos con coordinates para que sea mas agil la imple del jmap.
-	Mapa mapa;
+	Mapa mapa = new MapaRutas();
 	ArrayList<Coordinate> listaDeCoordenadas;
 	Coordinate puntoInicio;
 	Coordinate puntoDestino;
@@ -105,12 +112,12 @@ public class VentanaPrincipal {
 		
 		JButton btnInicio = new JButton("Marcar inicio");
 		botonesDelPanel.add(btnInicio);
-		btnInicio.setBounds(364, 420, 150, 23);
+		btnInicio.setBounds(284, 420, 150, 23);
 		frame.getContentPane().add(btnInicio);
 		
 		JButton btnDestino = new JButton("Marcar destino");
 		botonesDelPanel.add(btnDestino);
-		btnDestino.setBounds(617, 420, 150, 23);
+		btnDestino.setBounds(697, 420, 150, 23);
 		frame.getContentPane().add(btnDestino);
 		
 		campoInicio = new JTextField();
@@ -135,11 +142,6 @@ public class VentanaPrincipal {
 		frame.getContentPane().add(campoCoord2);
 		campoCoord2.setColumns(10);
 		
-		//Se inicializa el Jmap
-		mapViewerTree = new JMapViewerTree("Zones");
-		mapViewerTree.setBounds(10, 10, 930, 400);
-		frame.getContentPane().add(mapViewerTree);
-		
 		JLabel lblInicio = new JLabel("Inicio");
 		lblInicio.setBounds(224, 458, 50, 14);
 		frame.getContentPane().add(lblInicio);
@@ -156,7 +158,58 @@ public class VentanaPrincipal {
 		lblV.setBounds(557, 492, 50, 14);
 		frame.getContentPane().add(lblV);
 		
+		JButton btnLimpiar = new JButton("Limpiar");
+		btnLimpiar.setBounds(364, 520, 150, 23);
+		frame.getContentPane().add(btnLimpiar);
+		
+		JButton btnBorrarTodo = new JButton("Borrar Todo");
+		btnBorrarTodo.setBounds(617, 520, 150, 23);
+		frame.getContentPane().add(btnBorrarTodo);
+		
+		JButton btnObtenerCamino = new JButton("Obtener Camino Minimo");
+		btnObtenerCamino.setBounds(444, 420, 243, 23);
+		frame.getContentPane().add(btnObtenerCamino);
+		
+		JCheckBox chckbxPeaje = new JCheckBox("Peaje");
+		chckbxPeaje.setBounds(24, 518, 97, 23);
+		frame.getContentPane().add(chckbxPeaje);
+		
+		//Se inicializa el Jmap
+		mapViewerTree = new JMapViewerTree("Map");
+		mapViewerTree.setBounds(10, 10, 930, 400);
+		frame.getContentPane().add(mapViewerTree);
+		
+		
 		// Action listeners
+		chckbxPeaje.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (!peaje)
+					peaje = true;
+				else
+					peaje = false;
+				System.out.println(peaje);
+			}
+		});
+		btnObtenerCamino.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				obtenerCaminoMinimo();
+			}
+		});
+		btnBorrarTodo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				map().removeAllMapMarkers();
+				map().removeAllMapPolygons();
+			}
+		});
+		btnLimpiar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				limpiarPuntos();
+			}
+		});
 		btnAgregarPunto.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -215,10 +268,32 @@ public class VentanaPrincipal {
         });
 	}
 	
+	private void obtenerCaminoMinimo(){
+		actualizaPuntosYPoligonos();
+		
+		for (MapPolygon polygon: listaDePoligonosDelMapa){
+			System.out.println(polygon.getPoints().toString());
+			Coordenada coord1 = new Coordenada(null, polygon.getPoints().get(0).getLat(), polygon.getPoints().get(0).getLon());
+			Coordenada coord2 = new Coordenada(null, polygon.getPoints().get(1).getLat(), polygon.getPoints().get(1).getLon());
+			boolean conPeaje = checkPolygonName(polygon);
+			mapa.agregarCoordenada(coord1);
+			mapa.agregarCoordenada(coord2);
+			
+			mapa.agregarRuta(coord1, coord2, conPeaje);
+		}
+	}
+	
+	private boolean checkPolygonName(MapPolygon polygon) {
+		if (polygon.getName()!=null)
+			return true;
+		return false;
+	}
+	
 	/**
 	 * Generaliza el actionPerformed de los botones
 	 */
 	public void myActionPerformed(ActionEvent action, JButton button) {
+		
 		if (button.isSelected()){
 			button.setSelected(false);
 			button.setForeground(Color.BLACK);
@@ -238,6 +313,29 @@ public class VentanaPrincipal {
         return mapViewerTree.getViewer();
     }
 	
+
+	private void limpiarPuntos(){
+		actualizaPuntosYPoligonos();
+		ArrayList<MapMarker> listaDePuntosAQuitar = new ArrayList<>();
+		ArrayList<MapMarker> listaDePuntosAReemplazar = new ArrayList<>();
+		for (MapMarker punto: listaDePuntosDelMapa){
+			System.out.println(punto.getName());
+			if (punto.getName()!=null){
+				listaDePuntosAQuitar.add(punto);
+
+				MapMarkerDot puntoDeReemplazo = new MapMarkerDot(punto.getCoordinate());
+				puntoDeReemplazo.setBackColor(Color.BLUE);
+				listaDePuntosAReemplazar.add(puntoDeReemplazo);
+			}
+		}
+		for (MapMarker punto: listaDePuntosAReemplazar){
+			listaDeCoordenadas.add(punto.getCoordinate());
+			map().addMapMarker(punto);
+		}
+		borraPuntos(listaDePuntosAQuitar);
+	}
+	
+	
 	/**
 	 * Se añade al mapa un punto nuevo
 	 */
@@ -254,9 +352,7 @@ public class VentanaPrincipal {
 	 * este se borra junto con las aristas que salen de el.
 	 */
 	private void eliminarPunto(){
-		List<MapMarker> listaDePuntosDelMapa = map().getMapMarkerList();
-		List<MapPolygon> listaDePoligonosDelMapa = map().getMapPolygonList();
-		
+		actualizaPuntosYPoligonos();
 		ArrayList<MapMarker> listaDePuntosAQuitar = new ArrayList<>();
 		ArrayList<MapPolygon> listaDePoligonosAQuitar = new ArrayList<>();
 		for (MapMarker punto: listaDePuntosDelMapa){
@@ -268,13 +364,25 @@ public class VentanaPrincipal {
 							listaDePoligonosAQuitar.add(polygon);
 			}
 		}
+		borrarPoligonos(listaDePoligonosAQuitar);
+		borraPuntos(listaDePuntosAQuitar);
+	}
+
+	private void borrarPoligonos(ArrayList<MapPolygon> listaDePoligonosAQuitar) {
 		for (MapPolygon polygon: listaDePoligonosAQuitar){
 			map().removeMapPolygon(polygon);
 		}
+	}
+
+	private void borraPuntos(ArrayList<MapMarker> listaDePuntosAQuitar) {
 		for (MapMarker punto: listaDePuntosAQuitar){
 			map().removeMapMarker(punto);
 			System.out.println("se elimino un punto");
 			this.listaDeCoordenadas.remove(punto.getCoordinate());
+			if (punto.getName() != null && punto.getName().equals("Inicio"))
+				{this.puntoInicio = null; campoInicio.setText("");}
+			if (punto.getName() != null && punto.getName().equals("Destino"))
+				{this.puntoDestino = null; campoDestino.setText("");}
 		}
 	}
 	
@@ -308,23 +416,32 @@ public class VentanaPrincipal {
 	 * dibuja una linea entre ellos.
 	 */
 	private void seleccionandoRuta() {
-		List<MapMarker> listaDePuntosDelMapa = map().getMapMarkerList();
+		actualizaPuntosYPoligonos();
 		for (MapMarker punto: listaDePuntosDelMapa){
 
-			if (fueClickeado(punto) && !puntosSeleccionados.contains(punto))
+			if (fueClickeado(punto) && !puntosSeleccionados.contains(punto)){
 				this.puntosSeleccionados.add(punto);
+				campoCoord1.setText(round(posicionActualMapa.getLat(), 4) +"; "+ round(posicionActualMapa.getLon(), 4));
 			}
-			if (this.puntosSeleccionados.size()>=2){
-				dibujarLineaEntrePuntosSeleccionados();
-				deseleccionarPuntos();
-			}
+		}
+		if (this.puntosSeleccionados.size()>=2){
+			dibujarLineaEntrePuntosSeleccionados();
+			deseleccionarPuntos();
+		}
 	}
 
 	private void dibujarLineaEntrePuntosSeleccionados() {
 		Coordinate inicio = this.puntosSeleccionados.get(0).getCoordinate();
 		Coordinate destino = this.puntosSeleccionados.get(1).getCoordinate();
 		List<Coordinate> ruta = new ArrayList<Coordinate>(Arrays.asList(inicio, destino, destino));
-		map().addMapPolygon(new MapPolygonImpl(ruta));
+		MapPolygonImpl rutaMap = new MapPolygonImpl(ruta);
+		if (peaje){
+			rutaMap.setName("Peaje");
+			rutaMap.setColor(Color.MAGENTA);
+		}
+		else
+			rutaMap.setColor(Color.GREEN);
+		map().addMapPolygon(rutaMap);
 		
 	}
 	
@@ -334,7 +451,7 @@ public class VentanaPrincipal {
 	}
 	
 	private void agregarPuntoDeInicio(){
-		List<MapMarker> listaDePuntosDelMapa = map().getMapMarkerList();
+		actualizaPuntosYPoligonos();
 		for (MapMarker punto: listaDePuntosDelMapa){
 
 			if (fueClickeado(punto) && this.puntoInicio == null){
@@ -352,7 +469,7 @@ public class VentanaPrincipal {
 	}
 	
 	private void agregarPuntoDestino(){
-		List<MapMarker> listaDePuntosDelMapa = map().getMapMarkerList();
+		actualizaPuntosYPoligonos();
 		for (MapMarker punto: listaDePuntosDelMapa){
 
 			if (fueClickeado(punto) && this.puntoDestino == null){
@@ -416,5 +533,10 @@ public class VentanaPrincipal {
 	    value = value * factor;
 	    long tmp = Math.round(value);
 	    return (double) tmp / factor;
+	}
+	
+	private void actualizaPuntosYPoligonos(){
+		listaDePuntosDelMapa = map().getMapMarkerList();
+		listaDePoligonosDelMapa = map().getMapPolygonList();
 	}
 }
