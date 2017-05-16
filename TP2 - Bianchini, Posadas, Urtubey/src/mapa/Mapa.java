@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface Mapa {
 	
-	public boolean agregarCoordenada(Coordenada c);
-	public boolean agregarCoordenadas(Iterable<Coordenada> coordenadas);
-	public boolean agregarRuta(Coordenada c1, Coordenada c2, boolean tienePeaje); //Unidireccional
+	public void agregarCoordenada(Coordenada c);
+	public void agregarCoordenadas(Iterable<Coordenada> coordenadas);
+	public void agregarRuta(Coordenada c1, Coordenada c2, boolean tienePeaje); //Unidireccional
 	public List<Coordenada> getCoordenadas();
 	public Integer cantPeajes();
 	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino); //sin tener en cuenta los peajes.

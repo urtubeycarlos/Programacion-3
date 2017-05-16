@@ -19,32 +19,31 @@ public class MapaRutas implements Mapa {
 	}
 	
 	@Override
-	public boolean agregarCoordenada(Coordenada c) {
+	public void agregarCoordenada(Coordenada c) {
 		if( !_listaCoordenadas.contains(c) )
 			_listaCoordenadas.add(c);
-		boolean acum = true;
-		acum = acum && _grafoCiudades.agregarVertice( _listaCoordenadas.indexOf(c) );
-		return acum;
+		_grafoCiudades.agregarVertice( _listaCoordenadas.indexOf(c) );
 	}
 
 	@Override
-	public boolean agregarCoordenadas(Iterable<Coordenada> coordenadas) {
-		boolean acum = true;
+	public void agregarCoordenadas(Iterable<Coordenada> coordenadas) {
 		for( Coordenada c:coordenadas )
-			acum = acum && agregarCoordenada(c);
-		return acum;
+			agregarCoordenada(c);
 	}
 
 	@Override
-	public boolean agregarRuta(Coordenada c1, Coordenada c2, boolean tienePeaje) {
+	public void agregarRuta(Coordenada c1, Coordenada c2, boolean tienePeaje) {
 		Integer indC1 = _listaCoordenadas.indexOf(c1);
 		Integer indC2 = _listaCoordenadas.indexOf(c2);
 		
 		if( indC1 > _matrizPeajes.width() || indC2 > _matrizPeajes.height() )
 			_matrizPeajes.resize( _matrizPeajes.width()*2 , _matrizPeajes.height()*2);
 		
-		return _grafoCiudades.agregarArista(indC1, indC2) && ( tienePeaje? _matrizPeajes.set(indC1, indC2, true):true );
+		_grafoCiudades.agregarArista(indC1, indC2);
+		if( tienePeaje ) 
+			_matrizPeajes.set(indC1, indC2, true);
 	}
+
 
 	@Override
 	@SuppressWarnings("unchecked")
