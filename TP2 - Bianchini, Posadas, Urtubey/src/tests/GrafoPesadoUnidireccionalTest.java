@@ -114,4 +114,27 @@ public class GrafoPesadoUnidireccionalTest {
 		
 	}
 
+	@Test
+	public void sePuedeLlegarTest() throws Exception {
+
+		Method obtenerMenor = _grafo.getClass().getDeclaredMethod("sePuedeLlegar", Object.class, Object.class);
+		obtenerMenor.setAccessible(true);
+		
+		_grafo.agregarArista(0, 1);
+		_grafo.agregarArista(1, 2);
+		_grafo.agregarArista(0, 2);
+		
+		assertTrue( (Boolean) obtenerMenor.invoke(_grafo, 0, 2));
+		
+	}
+	
+	@Test
+	public void noSePuedeLlegarTest() throws Exception {
+
+		Method obtenerMenor = _grafo.getClass().getDeclaredMethod("sePuedeLlegar", Object.class, Object.class);
+		obtenerMenor.setAccessible(true);
+		assertFalse( (Boolean) obtenerMenor.invoke(_grafo, 0, 2));
+		
+	}
+	
 }
