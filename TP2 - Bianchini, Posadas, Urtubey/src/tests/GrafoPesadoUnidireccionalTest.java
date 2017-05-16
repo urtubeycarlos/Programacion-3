@@ -84,4 +84,10 @@ public class GrafoPesadoUnidireccionalTest {
 		
 		assertEquals(lista, _grafo.obtenerCaminoMinimo(0, 2));
 	}
+	
+	@Test(expected=RuntimeException.class)
+	public void caminoImposibleTest(){
+		_grafo.agregarArista(0, 1);
+		_grafo.obtenerCaminoMinimo(0, 2);
+	}
 }
