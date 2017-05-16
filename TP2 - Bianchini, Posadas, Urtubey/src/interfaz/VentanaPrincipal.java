@@ -9,7 +9,6 @@ import java.awt.Polygon;
 
 import javax.swing.JFrame;
 
-import org.junit.experimental.theories.Theories;
 import org.openstreetmap.gui.jmapviewer.*;
 import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
@@ -28,8 +27,6 @@ import java.awt.Color;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JTextField;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JCheckBox;
@@ -56,6 +53,7 @@ public class VentanaPrincipal {
 	private JTextField campoCoord1;
 	private JTextField campoDestino;
 	private JTextField campoCoord2;
+	private JTextField campoPeajes;
 	
 	/**
 	 * Launch the application.
@@ -167,18 +165,27 @@ public class VentanaPrincipal {
 		frame.getContentPane().add(btnBorrarTodo);
 		
 		JButton btnObtenerCamino = new JButton("Obtener Camino Minimo");
-		btnObtenerCamino.setBounds(444, 420, 243, 23);
+		btnObtenerCamino.setBounds(444, 420, 150, 23);
 		frame.getContentPane().add(btnObtenerCamino);
 		
 		JCheckBox chckbxPeaje = new JCheckBox("Peaje");
 		chckbxPeaje.setBounds(24, 518, 97, 23);
 		frame.getContentPane().add(chckbxPeaje);
 		
+		campoPeajes = new JTextField();
+		campoPeajes.setText("0");
+		campoPeajes.setBounds(661, 421, 26, 20);
+		frame.getContentPane().add(campoPeajes);
+		campoPeajes.setColumns(10);
+		
+		JLabel lblPeajes = new JLabel("Peajes");
+		lblPeajes.setBounds(605, 424, 56, 14);
+		frame.getContentPane().add(lblPeajes);
+		
 		//Se inicializa el Jmap
 		mapViewerTree = new JMapViewerTree("Map");
 		mapViewerTree.setBounds(10, 10, 930, 400);
 		frame.getContentPane().add(mapViewerTree);
-		
 		
 		// Action listeners
 		chckbxPeaje.addActionListener(new ActionListener() {
@@ -200,6 +207,7 @@ public class VentanaPrincipal {
 		});
 		btnBorrarTodo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				limpiarPuntos();
 				map().removeAllMapMarkers();
 				map().removeAllMapPolygons();
 			}
@@ -271,8 +279,35 @@ public class VentanaPrincipal {
 	private void obtenerCaminoMinimo(){
 		actualizaPuntosYPoligonos();
 		
+		pasarDatosAlMapa();
+		System.out.println("pasa datos al mapa");
+		ArrayList<Coordenada> caminoMinimo = obtenerCamino();
+		System.out.println("calculo camino minimo");
+		dibujarCaminoMinimo(caminoMinimo);
+	}
+
+	private void dibujarCaminoMinimo(ArrayList<Coordenada> caminoMinimo) {
+		for (int i=0;i<caminoMinimo.size()-1;i++){
+			System.out.println("camino :"+caminoMinimo.toString());
+			
+			Coordinate inicio = new Coordinate(caminoMinimo.get(i).getLatitud(), caminoMinimo.get(i).getLongitud());
+			Coordinate destino = new Coordinate(caminoMinimo.get(i+1).getLatitud(), caminoMinimo.get(i+1).getLongitud());
+			dibujarLineaEntrePuntos(inicio, destino, Color.RED);
+			
+		}
+	}
+
+	private ArrayList<Coordenada> obtenerCamino() {
+		Coordenada origen = new Coordenada("Inicio", this.puntoInicio.getLat(), this.puntoInicio.getLon()); 
+		Coordenada destino = new Coordenada("Destino", this.puntoDestino.getLat(), this.puntoDestino.getLon()); 
+		System.out.println(Integer.parseInt(campoPeajes.getText()));
+		ArrayList<Coordenada> caminoMinimo = (ArrayList<Coordenada>) mapa.obtenerRutaOptima(origen, destino, Integer.parseInt(campoPeajes.getText()));
+		System.out.println("mapa obtiene ruta optima");
+		return caminoMinimo;
+	}
+
+	private void pasarDatosAlMapa() {
 		for (MapPolygon polygon: listaDePoligonosDelMapa){
-			System.out.println(polygon.getPoints().toString());
 			Coordenada coord1 = new Coordenada(null, polygon.getPoints().get(0).getLat(), polygon.getPoints().get(0).getLon());
 			Coordenada coord2 = new Coordenada(null, polygon.getPoints().get(1).getLat(), polygon.getPoints().get(1).getLon());
 			boolean conPeaje = checkPolygonName(polygon);
@@ -280,6 +315,8 @@ public class VentanaPrincipal {
 			mapa.agregarCoordenada(coord2);
 			
 			mapa.agregarRuta(coord1, coord2, conPeaje);
+			mapa.agregarRuta(coord2, coord1, conPeaje);
+			
 		}
 	}
 	
@@ -433,16 +470,26 @@ public class VentanaPrincipal {
 	private void dibujarLineaEntrePuntosSeleccionados() {
 		Coordinate inicio = this.puntosSeleccionados.get(0).getCoordinate();
 		Coordinate destino = this.puntosSeleccionados.get(1).getCoordinate();
+		
+		dibujarLineaEntrePuntos(inicio, destino, null);
+		
+	}
+
+	private void dibujarLineaEntrePuntos(Coordinate inicio, Coordinate destino, Color color) {
+		System.out.println("checkpoint 1");
 		List<Coordinate> ruta = new ArrayList<Coordinate>(Arrays.asList(inicio, destino, destino));
 		MapPolygonImpl rutaMap = new MapPolygonImpl(ruta);
-		if (peaje){
+		// bug
+		if (peaje && color==null){
 			rutaMap.setName("Peaje");
 			rutaMap.setColor(Color.MAGENTA);
+		}
+		else if (color!=null){
+			rutaMap.setColor(color);
 		}
 		else
 			rutaMap.setColor(Color.GREEN);
 		map().addMapPolygon(rutaMap);
-		
 	}
 	
 	private void deseleccionarPuntos() {
