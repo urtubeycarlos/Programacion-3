@@ -86,9 +86,6 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 			}
 		}
 
-		if( !camino_actual.contains(destino) )
-			return null;
-
 		for( int i=1; i<camino_actual.size()-1; i++ ){
 			
 			E anterior = camino_actual.get(i-1);
