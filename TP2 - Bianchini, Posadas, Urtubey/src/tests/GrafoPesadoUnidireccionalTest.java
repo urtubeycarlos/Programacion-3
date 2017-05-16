@@ -2,8 +2,13 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -90,4 +95,23 @@ public class GrafoPesadoUnidireccionalTest {
 		_grafo.agregarArista(0, 1);
 		_grafo.obtenerCaminoMinimo(0, 2);
 	}
+	
+	@Test
+	public void obtenerMenorTest() throws Exception {
+
+		Method obtenerMenor = _grafo.getClass().getDeclaredMethod("obtenerMenor", HashMap.class, Set.class);
+		obtenerMenor.setAccessible(true);
+		
+		HashMap<Integer, Double> hashMapPrueba = new HashMap<>();
+		hashMapPrueba.put(1, 5.0);
+		hashMapPrueba.put(2, 7.0);
+		hashMapPrueba.put(3, 9.0);
+		
+		Set<Integer> setPrueba = new HashSet<Integer>();
+		setPrueba.add(1);
+		
+		assertEquals(new Integer(2), obtenerMenor.invoke(_grafo, hashMapPrueba, setPrueba));
+		
+	}
+
 }
