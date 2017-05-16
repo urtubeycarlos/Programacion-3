@@ -5,6 +5,7 @@ import java.util.Set;
 public interface Grafo<E> {
 
 	public boolean agregarVertice(E e);
+	public boolean eliminarVertice(E e);
 	public Set<E> getVertices();
 	public int cantVertices();
 	public boolean agregarArista(E e1, E e2);

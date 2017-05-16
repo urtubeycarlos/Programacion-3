@@ -18,6 +18,14 @@ public class GrafoUnidireccional<E> implements Grafo<E> {
 	}
 
 	@Override
+	public boolean eliminarVertice(E e) {
+		for( E vertice:getVertices() )
+			if( getVecinos(vertice).contains(e) )
+				eliminarArista(vertice, e);
+		return _vecinos.remove(e) != null;
+	}
+	
+	@Override
 	public Set<E> getVertices() {
 		return _vecinos.keySet();
 	}
