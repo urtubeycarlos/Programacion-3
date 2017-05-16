@@ -28,6 +28,11 @@ public class GrafoUnidireccionalTest {
 	}
 
 	@Test
+	public void eliminarVerticeTest(){
+		assertTrue(_grafo.eliminarVertice("Carlos"));
+	}
+	
+	@Test
 	public void agregarAristaTest(){
 		assertTrue( _grafo.existeArista("Sebas", "Juan") );
 	}
