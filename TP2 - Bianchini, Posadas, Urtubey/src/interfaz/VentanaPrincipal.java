@@ -1,6 +1,6 @@
 package interfaz;
 import mapa.Coordenada;
-import mapa.Mapa;
+import mapa.MapaRutas;
 
 import java.awt.EventQueue;
 import java.util.List;
@@ -48,7 +48,7 @@ public class VentanaPrincipal {
 	boolean peaje = false;
 	
 	// Trabajamos con coordinates para que sea mas agil la imple del jmap.
-	Mapa mapa = new MapaRutas();
+	MapaRutas mapa = new MapaRutas();
 	ArrayList<Coordinate> listaDeCoordenadas;
 	Coordinate puntoInicio;
 	Coordinate puntoDestino;
