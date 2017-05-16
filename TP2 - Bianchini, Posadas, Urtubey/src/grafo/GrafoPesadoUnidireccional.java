@@ -24,9 +24,13 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 	
 	@Override
 	public boolean eliminarVertice(E vertice){
+		eliminarPesos(vertice);
+		return super.eliminarVertice(vertice);
+	}
+
+	private void eliminarPesos(E vertice) {
 		for( E vecino:getVecinos(vertice) )
 			_matrizPesos.remove(vertice, vecino);
-		return super.eliminarVertice(vertice);
 	}
 	
 	@Override
@@ -37,6 +41,12 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 	public boolean agregarArista(E vertice1, E vertice2, Double peso){
 		_matrizPesos.set(vertice1, vertice2, peso);
 		return super.agregarArista(vertice1, vertice2);
+	}
+	
+	@Override
+	public boolean eliminarArista(E e1, E e2){
+		_matrizPesos.remove(e1, e2);
+		return super.eliminarArista(e1, e2);
 	}
 	
 	public Double getPeso(E vertice1, E vertice2){
