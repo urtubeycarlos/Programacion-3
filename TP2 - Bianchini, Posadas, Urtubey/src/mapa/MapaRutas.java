@@ -43,7 +43,11 @@ public class MapaRutas implements Mapa {
 		if( tienePeaje ) 
 			_matrizPeajes.set(indC1, indC2, true);
 	}
-
+	
+	@Override
+	public boolean existeRuta(Coordenada c1, Coordenada c2) {
+		return _grafoCiudades.existeArista( _listaCoordenadas.indexOf(c1) , _listaCoordenadas.indexOf(c2) );
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
