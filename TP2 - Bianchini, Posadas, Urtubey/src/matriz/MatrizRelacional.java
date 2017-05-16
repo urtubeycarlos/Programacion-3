@@ -14,7 +14,7 @@ public class MatrizRelacional<K, V> implements Matriz<K, V>{
 
 	@Override
 	public V get(K key1, K key2) {
-		checkKeys(key1, key2);
+		checkKeys(key1, key2, "acceder a un valor");
 		return _m.get(key1).get(key2);
 	}
 
@@ -22,6 +22,13 @@ public class MatrizRelacional<K, V> implements Matriz<K, V>{
 	public boolean set(K key1, K key2, V value) {
 		_m.putIfAbsent(key1, new HashMap<K, V>());
 		return _m.get(key1).put(key2, value) != null;
+	}
+	
+	public boolean remove(K key1, K key2){
+		checkKeys(key1, key2, "eliminar un valor");
+		if ( _m.get(key1).size() == 1 )
+			return _m.remove(key1) != null;
+		return _m.get(key1).remove(key2) != null;
 	}
 
 	@Override
@@ -48,9 +55,9 @@ public class MatrizRelacional<K, V> implements Matriz<K, V>{
 		return ret;
 	}
 	
-	private void checkKeys(K key1, K key2){
+	private void checkKeys(K key1, K key2, String accion){
 		if ( !_m.keySet().contains(key1) )
-			throw new IllegalArgumentException("Se intento acceder a un valor con una key invalida. key1 = " + key1);
+			throw new IllegalArgumentException("Se intento " + accion + " con una key invalida. key1 = " + key1);
 		if( !_m.get(key1).keySet().contains(key2) )
 			throw new IllegalArgumentException("Se intento acceder a un valor con una key invalida. key2 = " + key2);
 	}

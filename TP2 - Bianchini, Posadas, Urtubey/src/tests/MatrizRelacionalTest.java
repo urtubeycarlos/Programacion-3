@@ -31,6 +31,12 @@ public class MatrizRelacionalTest {
 		m.set("Carlos", "Sebas", 8);
 		assertEquals(new Integer(8), m.get("Carlos", "Sebas"));
 	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void removeTest(){
+		m.remove("Carlos", "Sebas");
+		m.get("Carlos", "Sebas");
+	}
 
 	@Test
 	public void rowOfTest(){
