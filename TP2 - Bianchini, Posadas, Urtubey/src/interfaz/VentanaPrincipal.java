@@ -195,13 +195,11 @@ public class VentanaPrincipal {
 					peaje = true;
 				else
 					peaje = false;
-				System.out.println(peaje);
 			}
 		});
 		btnObtenerCamino.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				obtenerCaminoMinimo();
 			}
 		});
@@ -254,7 +252,6 @@ public class VentanaPrincipal {
             public void mouseMoved(MouseEvent e) {
                 posicionActualFrame = e.getPoint();
                 posicionActualMapa = map().getPosition(posicionActualFrame);
-                //esto es alta magia
                 map().setToolTipText(map().getPosition(e.getPoint()).toString());
                 campoCoord2.setText(round(posicionActualMapa.getLat(), 4) +"; "+ round(posicionActualMapa.getLon(), 4));
             }
@@ -276,19 +273,47 @@ public class VentanaPrincipal {
         });
 	}
 	
+	//Metodos
 	private void obtenerCaminoMinimo(){
 		actualizaPuntosYPoligonos();
 		
 		pasarDatosAlMapa();
-		System.out.println("pasa datos al mapa");
 		ArrayList<Coordenada> caminoMinimo = obtenerCamino();
-		System.out.println("calculo camino minimo");
 		dibujarCaminoMinimo(caminoMinimo);
 	}
 
+	private void pasarDatosAlMapa() {
+		for (MapPolygon polygon: listaDePoligonosDelMapa){
+			Coordenada coord1 = new Coordenada(null, polygon.getPoints().get(0).getLat(), polygon.getPoints().get(0).getLon());
+			Coordenada coord2 = new Coordenada(null, polygon.getPoints().get(1).getLat(), polygon.getPoints().get(1).getLon());
+			
+			boolean conPeaje = checkPolygonName(polygon);
+			
+			mapa.agregarCoordenada(coord1);
+			mapa.agregarCoordenada(coord2);
+			
+			
+			mapa.agregarRuta(coord1, coord2, conPeaje);
+			mapa.agregarRuta(coord2, coord1, conPeaje);
+			
+			System.out.println(mapa.existeRuta(coord1, coord2));
+			System.out.println(mapa.existeRuta(coord2, coord1));
+			
+		}
+		System.out.println(mapa.getCoordenadas().toString());
+	}
+	
+	private ArrayList<Coordenada> obtenerCamino() {
+		Coordenada origen = new Coordenada("Inicio", this.puntoInicio.getLat(), this.puntoInicio.getLon()); 
+		Coordenada destino = new Coordenada("Destino", this.puntoDestino.getLat(), this.puntoDestino.getLon()); 
+		int cantPeajes = Integer.parseInt(campoPeajes.getText());
+		ArrayList<Coordenada> caminoMinimo = (ArrayList<Coordenada>) mapa.obtenerRutaOptima(origen, destino, cantPeajes);
+		return caminoMinimo;
+	}
+	
 	private void dibujarCaminoMinimo(ArrayList<Coordenada> caminoMinimo) {
+		System.out.println("camino :"+caminoMinimo.toString());
 		for (int i=0;i<caminoMinimo.size()-1;i++){
-			System.out.println("camino :"+caminoMinimo.toString());
 			
 			Coordinate inicio = new Coordinate(caminoMinimo.get(i).getLatitud(), caminoMinimo.get(i).getLongitud());
 			Coordinate destino = new Coordinate(caminoMinimo.get(i+1).getLatitud(), caminoMinimo.get(i+1).getLongitud());
@@ -297,29 +322,6 @@ public class VentanaPrincipal {
 		}
 	}
 
-	private ArrayList<Coordenada> obtenerCamino() {
-		Coordenada origen = new Coordenada("Inicio", this.puntoInicio.getLat(), this.puntoInicio.getLon()); 
-		Coordenada destino = new Coordenada("Destino", this.puntoDestino.getLat(), this.puntoDestino.getLon()); 
-		System.out.println(Integer.parseInt(campoPeajes.getText()));
-		ArrayList<Coordenada> caminoMinimo = (ArrayList<Coordenada>) mapa.obtenerRutaOptima(origen, destino, Integer.parseInt(campoPeajes.getText()));
-		System.out.println("mapa obtiene ruta optima");
-		return caminoMinimo;
-	}
-
-	private void pasarDatosAlMapa() {
-		for (MapPolygon polygon: listaDePoligonosDelMapa){
-			Coordenada coord1 = new Coordenada(null, polygon.getPoints().get(0).getLat(), polygon.getPoints().get(0).getLon());
-			Coordenada coord2 = new Coordenada(null, polygon.getPoints().get(1).getLat(), polygon.getPoints().get(1).getLon());
-			boolean conPeaje = checkPolygonName(polygon);
-			mapa.agregarCoordenada(coord1);
-			mapa.agregarCoordenada(coord2);
-			
-			mapa.agregarRuta(coord1, coord2, conPeaje);
-			mapa.agregarRuta(coord2, coord1, conPeaje);
-			
-		}
-	}
-	
 	private boolean checkPolygonName(MapPolygon polygon) {
 		if (polygon.getName()!=null)
 			return true;
@@ -349,14 +351,12 @@ public class VentanaPrincipal {
 	private JMapViewer map() {
         return mapViewerTree.getViewer();
     }
-	
 
 	private void limpiarPuntos(){
 		actualizaPuntosYPoligonos();
 		ArrayList<MapMarker> listaDePuntosAQuitar = new ArrayList<>();
 		ArrayList<MapMarker> listaDePuntosAReemplazar = new ArrayList<>();
 		for (MapMarker punto: listaDePuntosDelMapa){
-			System.out.println(punto.getName());
 			if (punto.getName()!=null){
 				listaDePuntosAQuitar.add(punto);
 
@@ -370,8 +370,8 @@ public class VentanaPrincipal {
 			map().addMapMarker(punto);
 		}
 		borraPuntos(listaDePuntosAQuitar);
+		map().removeAllMapPolygons();
 	}
-	
 	
 	/**
 	 * Se añade al mapa un punto nuevo
@@ -414,7 +414,6 @@ public class VentanaPrincipal {
 	private void borraPuntos(ArrayList<MapMarker> listaDePuntosAQuitar) {
 		for (MapMarker punto: listaDePuntosAQuitar){
 			map().removeMapMarker(punto);
-			System.out.println("se elimino un punto");
 			this.listaDeCoordenadas.remove(punto.getCoordinate());
 			if (punto.getName() != null && punto.getName().equals("Inicio"))
 				{this.puntoInicio = null; campoInicio.setText("");}
@@ -437,7 +436,6 @@ public class VentanaPrincipal {
 			seleccionandoRuta();
 		}
 		else if (agregarInicio.isSelected()){
-			//TODO: hacer la seleccion de inicio de los puntos.
 			agregarPuntoDeInicio();
 		}
 		else if (agregarDestino.isSelected()){
@@ -470,13 +468,10 @@ public class VentanaPrincipal {
 	private void dibujarLineaEntrePuntosSeleccionados() {
 		Coordinate inicio = this.puntosSeleccionados.get(0).getCoordinate();
 		Coordinate destino = this.puntosSeleccionados.get(1).getCoordinate();
-		
 		dibujarLineaEntrePuntos(inicio, destino, null);
-		
 	}
 
 	private void dibujarLineaEntrePuntos(Coordinate inicio, Coordinate destino, Color color) {
-		System.out.println("checkpoint 1");
 		List<Coordinate> ruta = new ArrayList<Coordinate>(Arrays.asList(inicio, destino, destino));
 		MapPolygonImpl rutaMap = new MapPolygonImpl(ruta);
 		// bug
@@ -518,7 +513,6 @@ public class VentanaPrincipal {
 	private void agregarPuntoDestino(){
 		actualizaPuntosYPoligonos();
 		for (MapMarker punto: listaDePuntosDelMapa){
-
 			if (fueClickeado(punto) && this.puntoDestino == null){
 				this.puntoDestino = new Coordinate(punto.getLat(), punto.getLon());
 				map().removeMapMarker(punto);
