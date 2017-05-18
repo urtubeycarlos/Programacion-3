@@ -86,7 +86,7 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 			}
 		}
 
-		for( int i=1; i<camino_actual.size()-1; i++ ){
+		for( int i=camino_actual.size()-2; i>0; i-- ){
 			
 			E anterior = camino_actual.get(i-1);
 			E siguiente = camino_actual.get(i+1);
@@ -96,6 +96,7 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 				if( !existeArista(actual, siguiente) ){
 					camino_actual.remove(actual);
 				} else {
+					//Hay que mejorar esta cuenta!!!!
 					double peso_ant_sig = getPeso(anterior, siguiente);
 					double peso_ant_act_sig = peso_ant_sig + getPeso(actual, siguiente);
 				

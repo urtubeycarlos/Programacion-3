@@ -29,8 +29,8 @@ public class MapaTest {
 		m.agregarCoordenadas( Arrays.asList(coordenadas) );
 		
 		m.agregarRuta(coordenadas[0], coordenadas[1], false);
-		m.agregarRuta(coordenadas[1], coordenadas[2], false);
-		m.agregarRuta(coordenadas[0], coordenadas[2], true);
+		m.agregarRuta(coordenadas[1], coordenadas[2], true);
+		m.agregarRuta(coordenadas[0], coordenadas[2], false);
 	
 	}
 
@@ -63,7 +63,7 @@ public class MapaTest {
 
 	@Test
 	public void obtenerRutaOptimaTest() {
-		System.out.println( m.obtenerRutaOptima(coordenadas[0], coordenadas[2], 0) );
+		System.out.println( m.obtenerRutaOptima(coordenadas[0], coordenadas[2], 1) );
 	}
 	
 

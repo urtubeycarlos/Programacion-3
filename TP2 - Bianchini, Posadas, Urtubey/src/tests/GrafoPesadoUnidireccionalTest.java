@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -87,6 +88,46 @@ public class GrafoPesadoUnidireccionalTest {
 		_grafo.agregarArista(0, 2, 7.0);
 		
 		assertEquals(lista, _grafo.obtenerCaminoMinimo(0, 2));
+	
+	
+	}
+	
+	@Test
+	public void obtenerCaminoMinimoTest2(){
+		
+		GrafoPesadoUnidireccional<Integer> g = new GrafoPesadoUnidireccional<>();
+
+		List<Integer> resultado_esperado = new ArrayList<Integer>();
+		Integer[] vertices_esperados = new Integer[]{1, 2, 3, 4};
+		resultado_esperado.addAll( Arrays.asList(vertices_esperados) );
+		
+		g.agregarVertice(1);
+		g.agregarVertice(2);
+		g.agregarVertice(3);
+		g.agregarVertice(4);
+		g.agregarVertice(5);
+		g.agregarVertice(6);
+		
+		g.agregarArista(1, 2, 4.0);
+		g.agregarArista(1, 6, 3.0);
+		g.agregarArista(1, 3, 8.0);
+		
+		g.agregarArista(2, 5, 1.0);
+		g.agregarArista(2, 3, 3.0);
+		
+		g.agregarArista(3, 4, 4.0);
+		g.agregarArista(3, 5, 1.0);
+		
+		g.agregarArista(5, 4, 4.0);
+		
+		g.agregarArista(6, 5, 3.0);
+		
+		System.out.println( g.obtenerCaminoMinimo(1, 4) );
+		
+		
+
+		
+//		assertEquals(lista, _grafo.obtenerCaminoMinimo(0, 2));
 	}
 	
 	@Test(expected=RuntimeException.class)

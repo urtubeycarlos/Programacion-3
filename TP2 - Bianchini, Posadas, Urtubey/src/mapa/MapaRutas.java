@@ -1,7 +1,9 @@
 package mapa;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import grafo.GrafoPesadoUnidireccional;
 import matriz.MatrizCartesiana;
@@ -97,35 +99,75 @@ public class MapaRutas implements Mapa {
 	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino, int cantPeajesMax) {
 
 		List<Coordenada> ret = new ArrayList<Coordenada>();
+		Set<Integer> destinos = new HashSet<Integer>();
 		ArrayList<Coordenada> referenciasCoordenadas = new ArrayList<Coordenada>();
+		MatrizCartesiana<Boolean> matrizPeajesCapas = new MatrizCartesiana<>( _grafoCiudades.getVertices().size() * (cantPeajesMax+1) , _grafoCiudades.getVertices().size() * (cantPeajesMax+1));
 		GrafoPesadoUnidireccional<Integer> grafoEnCapas = new GrafoPesadoUnidireccional<>();
 		
-		for( int i=0; i<=cantPeajesMax; i++ )
-			referenciasCoordenadas.addAll( _listaCoordenadas );
+		referenciasCoordenadas.addAll( _listaCoordenadas );
+		referenciasCoordenadas.addAll( _listaCoordenadas );
 
+		System.out.println(referenciasCoordenadas.size());
+		
+		for( int i=0; i<referenciasCoordenadas.size(); i++ ){
+			grafoEnCapas.agregarVertice(i);
+		}
+			
+		
+		for( int i=0; i<=cantPeajesMax; i++ ){
+			destinos.add( _listaCoordenadas.indexOf(destino) + i*_grafoCiudades.cantVertices());
+			for( int vertice:_grafoCiudades.getVertices() ) {
+				for( int vecino:_grafoCiudades.getVecinos(vertice) ) {
+					grafoEnCapas.agregarArista(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _grafoCiudades.getPeso(vertice, vecino));
+					matrizPeajesCapas.set(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _matrizPeajes.get(vertice, vecino));
+				}
+			}
+		
+				
+		}
+
+		
 		for( Integer vertice=0; vertice<referenciasCoordenadas.size(); vertice++ )
 			grafoEnCapas.agregarVertice(vertice);
 		
 		
-		for( int i=0; i<cantPeajesMax; i++ )
-		for( int vertice:_grafoCiudades.getVertices() )
-		for( int vecino:_grafoCiudades.getVecinos(vertice) )
-			grafoEnCapas.agregarArista(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _grafoCiudades.getPeso(vertice, vecino));
-
+		//Bloque del bien
 		
-		for( int i=0; i<cantPeajesMax; i++ )
-		for( int vertice:grafoEnCapas.getVertices() )
-		for( int vecino:grafoEnCapas.getVecinos(vertice) ) 
-				if( _matrizPeajes.get(vertice - i*_grafoCiudades.cantVertices(), vecino - i*_grafoCiudades.cantVertices()) ){
-					grafoEnCapas.eliminarArista(vertice - i*_grafoCiudades.cantVertices(), vecino - i*_grafoCiudades.cantVertices());
-					grafoEnCapas.agregarArista( vertice - i*_grafoCiudades.cantVertices() , vecino);
+		
+		for( int i=0; i<cantPeajesMax; i++ ){
+			
+			for( Integer vertice:grafoEnCapas.getVertices() ){
+				
+				for( Integer vecino:grafoEnCapas.getVecinos(vertice) ){
+					
+					if( matrizPeajesCapas.get(vertice, vecino) ){
+						
+						grafoEnCapas.agregarArista(vertice, vecino + _grafoCiudades.cantVertices(), grafoEnCapas.getPeso(vertice, vecino) );
+						grafoEnCapas.eliminarArista(vertice, vecino);
+						
+					}
+						
+					
 				}
-
-		List<Integer> res = grafoEnCapas.obtenerCaminoMinimo( referenciasCoordenadas.indexOf(origen) , referenciasCoordenadas.indexOf(destino) + referenciasCoordenadas.indexOf(destino)*cantPeajesMax );
+				
+			}
+			
+			
+		}
 		
-		for(Integer indice:res)
-			ret.add( referenciasCoordenadas.get(indice) );
+		System.out.println( grafoEnCapas.existeArista(1, 5) );
+			
+		List<ArrayList<Integer>> resultados = new ArrayList<ArrayList<Integer>>();
+		for( Integer dest:destinos )
+			resultados.add( (ArrayList<Integer>) grafoEnCapas.obtenerCaminoMinimo( referenciasCoordenadas.indexOf(origen) , dest) );
+		
+		System.out.println(destinos);
+		System.out.println(resultados);
+		
+//		for(Integer indice:res)
+//			ret.add( referenciasCoordenadas.get(indice) );
 		return ret;
+		
 	}
 	
 }
