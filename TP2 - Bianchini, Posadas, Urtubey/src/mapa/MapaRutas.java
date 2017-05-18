@@ -45,16 +45,17 @@ public class MapaRutas implements Mapa {
 	
 	private double calcularDistancia(Coordenada c1, Coordenada c2){
 		
-		double lat1 = c1.getLatitudEnRadianes();
-		double long1 = c1.getLongitudEnRadianes();
-		double lat2 = c2.getLatitudEnRadianes();
-		double long2 = c2.getLongitudEnRadianes();
-		
-		double radio = 6378.137;
-		double distLong = long2 - long1;
-		double distanciaCoord = Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(distLong)) * radio;
-		
-		return (distanciaCoord * 0.621371192);
+//		double lat1 = c1.getLatitudEnRadianes();
+//		double long1 = c1.getLongitudEnRadianes();
+//		double lat2 = c2.getLatitudEnRadianes();
+//		double long2 = c2.getLongitudEnRadianes();
+//		
+//		double radio = 6378.137;
+//		double distLong = long2 - long1;
+//		double distanciaCoord = Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(distLong)) * radio;
+//		
+//		return (distanciaCoord * 0.621371192);
+		return (Math.hypot(c2.getLatitud() - c2.getLatitud(), c2.getLongitud() - c2.getLongitud()) * 1e-5);
 		
 	}
 	
