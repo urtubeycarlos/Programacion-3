@@ -89,7 +89,6 @@ public class GrafoPesadoUnidireccionalTest {
 		
 		assertEquals(lista, _grafo.obtenerCaminoMinimo(0, 2));
 	
-	
 	}
 	
 	@Test
@@ -122,12 +121,7 @@ public class GrafoPesadoUnidireccionalTest {
 		
 		g.agregarArista(6, 5, 3.0);
 		
-		System.out.println( g.obtenerCaminoMinimo(1, 4) );
-		
-		
-
-		
-//		assertEquals(lista, _grafo.obtenerCaminoMinimo(0, 2));
+		assertEquals(resultado_esperado, g.obtenerCaminoMinimo(1, 4));
 	}
 	
 	@Test(expected=RuntimeException.class)
