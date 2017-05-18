@@ -44,20 +44,17 @@ public class GrafoPesadoUnidireccionalTest {
 	
 	@Test
 	public void agregarAristaTest(){
-		
 		assertTrue(_grafo.agregarArista(0, 1));
 	}
 	
 	@Test
 	public void eliminarAristaTest(){
-		
 		_grafo.agregarArista(0, 1);
 		assertTrue(_grafo.eliminarArista(0, 1));
 	}
 	
 	@Test
 	public void agregarAristaPesadaTest(){
-		
 		assertTrue(_grafo.agregarArista(0, 1, 3.0));
 	}
 	

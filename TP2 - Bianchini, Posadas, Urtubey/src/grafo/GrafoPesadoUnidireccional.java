@@ -56,11 +56,14 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 	
 	public GrafoPesadoUnidireccional<E> clonar(){
 		GrafoPesadoUnidireccional<E> ret = new GrafoPesadoUnidireccional<>();
-		for(E vertice:getVertices()){
+		
+		for(E vertice:getVertices())
 			ret.agregarVertice(vertice);
-			for(E vecino:getVecinos(vertice))
-				ret.agregarArista(vertice, vecino, getPeso(vertice, vecino));
-		} return ret;
+		
+		for(E vertice:getVertices())
+		for(E vecino:getVecinos(vertice))
+			ret.agregarArista(vertice, vecino, getPeso(vertice, vecino));
+		return ret;
 	}
 
 	public List<E> obtenerCaminoMinimo(E origen, E destino){

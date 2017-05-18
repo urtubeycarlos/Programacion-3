@@ -294,7 +294,7 @@ public class VentanaPrincipal {
 			
 			
 			mapa.agregarRuta(coord1, coord2, conPeaje);
-			mapa.agregarRuta(coord2, coord1, conPeaje);
+			//mapa.agregarRuta(coord2, coord1, conPeaje);
 			
 			System.out.println(mapa.existeRuta(coord1, coord2));
 			System.out.println(mapa.existeRuta(coord2, coord1));

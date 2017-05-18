@@ -91,5 +91,44 @@ public class MapaTest {
 
 	}
 	
+	@Test
+	public void obtenerRutaConPeajesSobrantesTest() {
+		Coordenada[] coordenas_esperadas = new Coordenada[]{
+				coordenadas[0],
+				coordenadas[2]
+		};
+		
+		List<Coordenada> resultado_esperado = new ArrayList<Coordenada>( Arrays.asList(coordenas_esperadas) );
+
+		assertEquals(resultado_esperado, m.obtenerRutaOptima(coordenadas[0], coordenadas[2], 5));
+	}
+	
+	@Test()
+	public void sePuedeLlegarSinPeajesTest() {
+		Coordenada[] coordenas_esperadas = new Coordenada[]{
+				coordenadas[0],
+				coordenadas[2]
+		};
+		
+		List<Coordenada> resultado_esperado = new ArrayList<Coordenada>( Arrays.asList(coordenas_esperadas) );
+		assertEquals(resultado_esperado, m.obtenerRutaOptima(coordenadas[0], coordenadas[2], 0));
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void noSePuedeLlegarSinPeajesTest() {
+		MapaRutas m2 = new MapaRutas();
+		
+		coordenadas = new Coordenada[]{
+				new Coordenada("Springfield", 510.0, 213.0), 
+				new Coordenada("Shelbyville", 310.0, 220.0), 
+				new Coordenada("Ciudad Gritos", 666.0, 123.0)
+		};
+		
+		m2.agregarCoordenadas( Arrays.asList(coordenadas) );
+		m2.agregarRuta(coordenadas[0], coordenadas[1], false);
+		m2.agregarRuta(coordenadas[1], coordenadas[2], true);
+		
+		m2.obtenerRutaOptima(coordenadas[0], coordenadas[2], 0);
+	}
 
 }

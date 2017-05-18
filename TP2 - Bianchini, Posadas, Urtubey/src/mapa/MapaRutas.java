@@ -97,25 +97,53 @@ public class MapaRutas implements Mapa {
 		
 		for( int i=0; i<=cantPeajesMax; i++ ){
 			destinos.add( _listaCoordenadas.indexOf(destino) + i*_grafoCiudades.cantVertices());
-			for( int vertice:_grafoCiudades.getVertices() ) {
-				for( int vecino:_grafoCiudades.getVecinos(vertice) ) {
-					grafoEnCapas.agregarArista(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _grafoCiudades.getPeso(vertice, vecino));
-					matrizPeajesCapas.set(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _matrizPeajes.get(vertice, vecino));
+		}
+		
+		int aristas_peajes_agregadas = 0;
+		for( int i=0; i<cantPeajesMax; i++){
+			for( Integer vertice:grafoEnCapas.getVertices() ){
+				for( Integer vecino:grafoEnCapas.getVecinos(vertice) ){
+				
 				}
 			}
 		}
+			
 		
-		for( int i=0; i<cantPeajesMax; i++ )
-		for( Integer vertice:_grafoCiudades.getVertices() )
-		for( Integer vecino:_grafoCiudades.getVecinos(vertice) )
-			if( matrizPeajesCapas.get(vertice, vecino) ){
-				grafoEnCapas.agregarArista(vertice +  i*_grafoCiudades.cantVertices(), vecino + (i+1)*_grafoCiudades.cantVertices(), grafoEnCapas.getPeso(vertice +  i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices()) );
-				grafoEnCapas.eliminarArista(vertice +  i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices());
-			}
+		
+//		
+//		for( int i=0; i<=cantPeajesMax; i++ ){
+//			destinos.add( _listaCoordenadas.indexOf(destino) + i*_grafoCiudades.cantVertices());
+//			for( int vertice:_grafoCiudades.getVertices() ) {
+//				for( int vecino:_grafoCiudades.getVecinos(vertice) ) {
+//					grafoEnCapas.agregarArista(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _grafoCiudades.getPeso(vertice, vecino));
+//					matrizPeajesCapas.set(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _matrizPeajes.get(vertice, vecino));
+//				}
+//			}
+//		}
+//		
+//		for( int i=0; i<=cantPeajesMax; i++ )
+//		for( Integer vertice:_grafoCiudades.getVertices() )
+//		for( Integer vecino:_grafoCiudades.getVecinos(vertice) )
+//			if( matrizPeajesCapas.get(vertice, vecino) ){
+//				if( i != cantPeajesMax ){
+//					grafoEnCapas.agregarArista(vertice +  i*_grafoCiudades.cantVertices(), vecino + (i+1)*_grafoCiudades.cantVertices(), grafoEnCapas.getPeso(vertice +  i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices()) );
+//					grafoEnCapas.eliminarArista(vertice +  i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices());
+//				} else {
+//					grafoEnCapas.eliminarArista(vertice +  i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices());
+//					if ( destinos.contains( vecino + i*_grafoCiudades.cantVertices() ) )
+//						destinos.remove( vecino + i*_grafoCiudades.cantVertices() );
+//				}
+//			}
 						
 		List<ArrayList<Integer>> resultados = new ArrayList<ArrayList<Integer>>();
-		for( Integer dest:destinos )
-			resultados.add( (ArrayList<Integer>) grafoEnCapas.obtenerCaminoMinimo( referenciasCoordenadas.indexOf(origen) , dest) );
+		for( Integer dest:destinos ){
+			try {
+				resultados.add( (ArrayList<Integer>) grafoEnCapas.obtenerCaminoMinimo( referenciasCoordenadas.indexOf(origen) , dest) );
+			} catch (Exception e){
+				continue;
+			}
+		}
+			
 		
 		for( Integer indice:obtenerMejorResultado(resultados, grafoEnCapas) )
 			ret.add( referenciasCoordenadas.get(indice) );
@@ -177,7 +205,6 @@ public class MapaRutas implements Mapa {
 			}
 				
 		} return ret;
-		
 		
 	}
 	
