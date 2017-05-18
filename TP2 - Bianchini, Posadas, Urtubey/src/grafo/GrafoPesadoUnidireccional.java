@@ -53,6 +53,15 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 		super.checkearArista(vertice1, vertice2, "obtener el peso");
 		return _matrizPesos.get(vertice1, vertice2);
 	}
+	
+	public GrafoPesadoUnidireccional<E> clonar(){
+		GrafoPesadoUnidireccional<E> ret = new GrafoPesadoUnidireccional<>();
+		for(E vertice:getVertices()){
+			ret.agregarVertice(vertice);
+			for(E vecino:getVecinos(vertice))
+				ret.agregarArista(vertice, vecino, getPeso(vertice, vecino));
+		} return ret;
+	}
 
 	public List<E> obtenerCaminoMinimo(E origen, E destino){
 
@@ -104,7 +113,6 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 				}
 			}
 		}
-		
 		
 		return camino_actual;
 	}

@@ -46,19 +46,8 @@ public class MapaRutas implements Mapa {
 	}
 	
 	private double calcularDistancia(Coordenada c1, Coordenada c2){
-		
-//		double lat1 = c1.getLatitudEnRadianes();
-//		double long1 = c1.getLongitudEnRadianes();
-//		double lat2 = c2.getLatitudEnRadianes();
-//		double long2 = c2.getLongitudEnRadianes();
-//		
-//		double radio = 6378.137;
-//		double distLong = long2 - long1;
-//		double distanciaCoord = Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(distLong)) * radio;
-//		
-//		return (distanciaCoord * 0.621371192);
-		return (Math.hypot(c2.getLatitud() - c2.getLatitud(), c2.getLongitud() - c2.getLongitud()) * 1e-5);
-		
+		return Math.sqrt( Math.pow(c2.getLatitud() - c1.getLatitud(), 2) + Math.pow(c2.getLongitud() - c1.getLongitud(), 2.0) );
+		//		return (Math.hypot((c2.getLatitud() - c2.getLatitud()), (c2.getLongitud() - c2.getLongitud())) * 1e-5);
 	}
 	
 	@Override
@@ -84,20 +73,14 @@ public class MapaRutas implements Mapa {
 	}
 
 	@Override
-	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino) {
-		List<Coordenada> ret = new ArrayList<Coordenada>();
-		Integer indOrigen = _listaCoordenadas.indexOf(origen);
-		Integer indDestino = _listaCoordenadas.indexOf(destino);
-		List<Integer> res = _grafoCiudades.obtenerCaminoMinimo(indOrigen, indDestino);
-		for(Integer indice:res)
-			ret.add( _listaCoordenadas.get(indice) );
-		return ret;
-		
-	}
-
-	@Override
 	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino, int cantPeajesMax) {
 
+		if( cantPeajesMax > cantPeajes() )
+			return obtenerRutaOptima(origen, destino);
+		
+		if( cantPeajesMax == 0 )
+			return obtenerRutaOptimaSinPeajes(origen, destino);
+		
 		List<Coordenada> ret = new ArrayList<Coordenada>();
 		Set<Integer> destinos = new HashSet<Integer>();
 		ArrayList<Coordenada> referenciasCoordenadas = new ArrayList<Coordenada>();
@@ -105,14 +88,12 @@ public class MapaRutas implements Mapa {
 		GrafoPesadoUnidireccional<Integer> grafoEnCapas = new GrafoPesadoUnidireccional<>();
 		
 		referenciasCoordenadas.addAll( _listaCoordenadas );
-		referenciasCoordenadas.addAll( _listaCoordenadas );
-
-		System.out.println(referenciasCoordenadas.size());
-		
-		for( int i=0; i<referenciasCoordenadas.size(); i++ ){
-			grafoEnCapas.agregarVertice(i);
+		for( int i=0; i<cantPeajesMax; i++ ){
+			referenciasCoordenadas.addAll( _listaCoordenadas );
 		}
-			
+
+		for( Integer vertice=0; vertice<referenciasCoordenadas.size(); vertice++ )
+			grafoEnCapas.agregarVertice(vertice);
 		
 		for( int i=0; i<=cantPeajesMax; i++ ){
 			destinos.add( _listaCoordenadas.indexOf(destino) + i*_grafoCiudades.cantVertices());
@@ -122,51 +103,81 @@ public class MapaRutas implements Mapa {
 					matrizPeajesCapas.set(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _matrizPeajes.get(vertice, vecino));
 				}
 			}
-		
-				
 		}
-
 		
-		for( Integer vertice=0; vertice<referenciasCoordenadas.size(); vertice++ )
-			grafoEnCapas.agregarVertice(vertice);
-		
-		
-		//Bloque del bien
-		
-		
-		for( int i=0; i<cantPeajesMax; i++ ){
-			
-			for( Integer vertice:grafoEnCapas.getVertices() ){
-				
-				for( Integer vecino:grafoEnCapas.getVecinos(vertice) ){
-					
-					if( matrizPeajesCapas.get(vertice, vecino) ){
-						
-						grafoEnCapas.agregarArista(vertice, vecino + _grafoCiudades.cantVertices(), grafoEnCapas.getPeso(vertice, vecino) );
-						grafoEnCapas.eliminarArista(vertice, vecino);
-						
-					}
-						
-					
-				}
-				
+		for( int i=0; i<cantPeajesMax; i++ )
+		for( Integer vertice:_grafoCiudades.getVertices() )
+		for( Integer vecino:_grafoCiudades.getVecinos(vertice) )
+			if( matrizPeajesCapas.get(vertice, vecino) ){
+				grafoEnCapas.agregarArista(vertice +  i*_grafoCiudades.cantVertices(), vecino + (i+1)*_grafoCiudades.cantVertices(), grafoEnCapas.getPeso(vertice +  i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices()) );
+				grafoEnCapas.eliminarArista(vertice +  i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices());
 			}
-			
-			
-		}
-		
-		System.out.println( grafoEnCapas.existeArista(1, 5) );
-			
+						
 		List<ArrayList<Integer>> resultados = new ArrayList<ArrayList<Integer>>();
 		for( Integer dest:destinos )
 			resultados.add( (ArrayList<Integer>) grafoEnCapas.obtenerCaminoMinimo( referenciasCoordenadas.indexOf(origen) , dest) );
 		
-		System.out.println(destinos);
-		System.out.println(resultados);
-		
-//		for(Integer indice:res)
-//			ret.add( referenciasCoordenadas.get(indice) );
+		for( Integer indice:obtenerMejorResultado(resultados, grafoEnCapas) )
+			ret.add( referenciasCoordenadas.get(indice) );
 		return ret;
+		
+	}
+	
+	@Override
+	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino) {
+		
+		List<Coordenada> ret = new ArrayList<Coordenada>();
+		List<Integer> res = _grafoCiudades.obtenerCaminoMinimo( _listaCoordenadas.indexOf(origen), _listaCoordenadas.indexOf(destino));
+		
+		for(Integer indice:res)
+			ret.add( _listaCoordenadas.get(indice) );
+		return ret;
+		
+	}
+	
+	private List<Coordenada> obtenerRutaOptimaSinPeajes(Coordenada origen, Coordenada destino){
+		
+		GrafoPesadoUnidireccional<Integer> copiaGrafo = _grafoCiudades.clonar();
+		List<Integer> resultado;
+		List<Coordenada> ret = new ArrayList<Coordenada>();
+		
+		for( Integer vertice:copiaGrafo.getVertices() )
+		for( Integer vecino:copiaGrafo.getVecinos(vertice) )
+			if( _matrizPeajes.get(vertice, vecino) )
+				copiaGrafo.eliminarArista(vertice, vecino);
+		
+		try {
+			resultado = copiaGrafo.obtenerCaminoMinimo( _listaCoordenadas.indexOf(origen), _listaCoordenadas.indexOf(destino) );
+		} catch (Exception e) {
+			throw new IllegalArgumentException("No se puede llegar a destino sin pasar por ningun peaje. destino = " + destino);
+		}
+		
+		for(Integer indice:resultado)
+			ret.add( _listaCoordenadas.get(indice) );
+		return ret;
+		
+	}
+	
+	private ArrayList<Integer> obtenerMejorResultado(List<ArrayList<Integer>> resultados, GrafoPesadoUnidireccional<Integer> grafo_pesos){
+		
+		ArrayList<Integer> ret = null;
+		Double mejor_peso = null;
+		for( ArrayList<Integer> resultado:resultados ){
+			double acum = 0.0;
+			for( int i=0; i<resultado.size()-1; i++ ){
+				acum += grafo_pesos.getPeso( resultado.get(i) , resultado.get(i+1) );
+			}
+			
+			if( mejor_peso == null ){
+				mejor_peso = acum;
+				ret = resultado;
+			} else if( ( acum < mejor_peso ) || ( acum == mejor_peso && resultado.size() < ret.size() ) ){
+				mejor_peso = acum;
+				ret = resultado;
+			}
+				
+		} return ret;
+		
 		
 	}
 	

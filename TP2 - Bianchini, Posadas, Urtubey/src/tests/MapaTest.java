@@ -2,7 +2,11 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,10 +64,31 @@ public class MapaTest {
 	public void cantPeajes() {
 		assertEquals(new Integer(1), m.cantPeajes());
 	}
+	
+	@Test
+	public void calculaDistanciaTest() {
+		Method calcDistancia;
+		try {
+			calcDistancia = m.getClass().getDeclaredMethod("calcularDistancia", Coordenada.class, Coordenada.class);
+			calcDistancia.setAccessible(true);
+			assertTrue( (double) calcDistancia.invoke(m, coordenadas[0], coordenadas[2]) == 180.0999722376436);
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		
+	}
 
 	@Test
 	public void obtenerRutaOptimaTest() {
-		System.out.println( m.obtenerRutaOptima(coordenadas[0], coordenadas[2], 1) );
+		Coordenada[] coordenas_esperadas = new Coordenada[]{
+				coordenadas[0],
+				coordenadas[2]
+		};
+		
+		List<Coordenada> resultado_esperado = new ArrayList<Coordenada>( Arrays.asList(coordenas_esperadas) );
+
+		assertEquals(resultado_esperado, m.obtenerRutaOptima(coordenadas[0], coordenadas[2], 1));
+
 	}
 	
 
