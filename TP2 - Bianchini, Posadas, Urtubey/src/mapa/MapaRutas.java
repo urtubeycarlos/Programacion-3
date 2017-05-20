@@ -1,8 +1,11 @@
 package mapa;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import grafo.GrafoPesadoUnidireccional;
@@ -181,10 +184,17 @@ public class MapaRutas implements Mapa {
 		List<Integer> resultado;
 		List<Coordenada> ret = new ArrayList<Coordenada>();
 		
-		for( Integer vertice:copiaGrafo.getVertices() )
+		HashMap<Integer, Integer> vecinosABorrar = new HashMap<>();
+		for( Integer vertice:copiaGrafo.getVertices() ) //posible problema: iterando sobre lista y eliminando objetos de ella
 		for( Integer vecino:copiaGrafo.getVecinos(vertice) )
 			if( _matrizPeajes.get(vertice, vecino) )
-				copiaGrafo.eliminarArista(vertice, vecino);
+				vecinosABorrar.put(vertice, vecino);
+				//copiaGrafo.eliminarArista(vertice, vecino);
+		
+		for (Entry<Integer, Integer> entry : vecinosABorrar.entrySet())
+		{
+		    copiaGrafo.eliminarArista(entry.getKey(),entry.getValue());
+		}
 		
 		try {
 			resultado = copiaGrafo.obtenerCaminoMinimo( _listaCoordenadas.indexOf(origen), _listaCoordenadas.indexOf(destino) );

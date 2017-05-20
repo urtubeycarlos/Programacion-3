@@ -86,7 +86,10 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 		
 		while( !visitados.contains(destino) ){
 			
-			nodo_actual = obtenerMenor(distancias, visitados);
+			nodo_actual = obtenerMenor(distancias, visitados); 
+			/*FIXME: aca esta el problema. siempre busca el menor
+			*eso significa que si hay una ruta recta directa mas larga que la primer arista alternativa, no la
+			considera.*/
 			visitados.add(nodo_actual);
 			camino_actual.add(nodo_actual);
 
