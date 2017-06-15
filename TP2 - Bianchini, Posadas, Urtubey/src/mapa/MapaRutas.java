@@ -85,14 +85,13 @@ public class MapaRutas implements Mapa {
 		List<Coordenada> ret = new ArrayList<Coordenada>();
 		Set<Integer> destinos = new HashSet<Integer>();
 		ArrayList<Coordenada> referenciasCoordenadas = new ArrayList<Coordenada>();
-//		MatrizCartesiana<Boolean> matrizPeajesCapas = new MatrizCartesiana<>( _grafoCiudades.getVertices().size() * (cantPeajesMax+1) , _grafoCiudades.getVertices().size() * (cantPeajesMax+1));
 		GrafoPesadoUnidireccional<Integer> grafoEnCapas = new GrafoPesadoUnidireccional<>();
 	
 		referenciasCoordenadas.addAll( _listaCoordenadas ); //Se guarda las referencias a los vertices una vez.
-		for( int i=0; i<cantPeajesMax; i++ ){ //Se guardan n referencias a los vertices de nuevo, con n la cantidad de peajes maxima que quiero.
+		for( int c=0; c<cantPeajesMax; c++ ){ //Se guardan n referencias a los vertices de nuevo, con n la cantidad de peajes maxima que quiero.
 											 //Tambien calcula los destinos.
 			referenciasCoordenadas.addAll( _listaCoordenadas );
-			destinos.add( _listaCoordenadas.indexOf(destino) + i*_grafoCiudades.cantVertices());
+			destinos.add( _listaCoordenadas.indexOf(destino) + c*_grafoCiudades.cantVertices());
 		}
 
 		//Agrega los vertices al grafo en capas
@@ -107,10 +106,12 @@ public class MapaRutas implements Mapa {
 			for(Integer vertice:_grafoCiudades.getVertices())
 			for(Integer vecino:_grafoCiudades.getVecinos(vertice))
 				if(_grafoCiudades.existeArista(vertice, vecino))
-					if( !_matrizPeajes.get(vertice, vecino) )
+					if( !_matrizPeajes.get(vertice, vecino) ) //Si no tiene peaje...
 						grafoEnCapas.agregarArista( _grafoCiudades.cantVertices() * c + vertice, _grafoCiudades.cantVertices() * c + vecino, _grafoCiudades.getPeso(vertice, vecino) );
-					else if ( c < cantPeajesMax )
+						//Agrega una arista entre el vertice y su vecino en la misma capa.
+					else if ( c < cantPeajesMax ) //Si tiene y no estamos en la ultima capa...
 						grafoEnCapas.agregarArista( _grafoCiudades.cantVertices() * c + vertice, _grafoCiudades.cantVertices() * ( c+1 ) + vecino, _grafoCiudades.getPeso(vertice, vecino) );
+						//Agrega una arista entre el vertice y su vecino en la misma capa.
 			
 		}
 		
@@ -133,13 +134,18 @@ public class MapaRutas implements Mapa {
 		
 	}
 	
+	/**
+	 * Devuelve una ruta optima sin tener en cuenta los peajes, 
+	 */
 	@Override
 	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino) {
 		
 		List<Coordenada> ret = new ArrayList<Coordenada>();
-		List<Integer> res = _grafoCiudades.obtenerCaminoMinimo( _listaCoordenadas.indexOf(origen), _listaCoordenadas.indexOf(destino));
 		
-		for(Integer indice:res)
+		//Obtiene un camino minimo sin tener en cuenta los peajes llamando al metodo obtenerCaminoMinimo del grafo original.
+		//El resultado es una lista de Integers que corresponde al numero de cada vertice del grafo.
+		List<Integer> res = _grafoCiudades.obtenerCaminoMinimo( _listaCoordenadas.indexOf(origen), _listaCoordenadas.indexOf(destino));
+		for(Integer indice:res) //Convierte la lista de Integers a una lista de Coordenadas.
 			ret.add( _listaCoordenadas.get(indice) );
 		return ret;
 		
