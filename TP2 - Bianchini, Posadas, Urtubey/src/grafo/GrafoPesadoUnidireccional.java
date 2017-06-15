@@ -87,9 +87,6 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 		while( !visitados.contains(destino) ){
 			
 			nodo_actual = obtenerMenor(distancias, visitados); 
-			/*FIXME: aca esta el problema. siempre busca el menor
-			*eso significa que si hay una ruta recta directa mas larga que la primer arista alternativa, no la
-			considera.*/
 			visitados.add(nodo_actual);
 			camino_actual.add(nodo_actual);
 
@@ -101,24 +98,26 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 			}
 		}
 
-		for ( int i=1; i<camino_actual.size()-1; i++ ) {
-			
-			E anterior = camino_actual.get(i-1);
-			E siguiente = camino_actual.get(i+1);
-			E actual = camino_actual.get(i);
-			
-			if( existeArista(anterior, siguiente) ) {
-				if( !existeArista(actual, siguiente) ){
-					camino_actual.remove(actual);
-				} else {
-					double peso_acum_actual = distancias.get(actual);
-					double peso_acum_anterior = distancias.get(anterior);
-
-					if( peso_acum_actual >= peso_acum_anterior )
-						camino_actual.remove(actual);
-				}
-			}
-		}
+		//Quite la depuración porque es innecesaria.
+		
+//		for ( int i=1; i<camino_actual.size()-1; i++ ) {
+//			
+//			E anterior = camino_actual.get(i-1);
+//			E siguiente = camino_actual.get(i+1);
+//			E actual = camino_actual.get(i);
+//			
+//			if( existeArista(anterior, siguiente) ) {
+//				if( !existeArista(actual, siguiente) ){
+//					camino_actual.remove(actual);
+//				} else {
+//					double peso_acum_actual = distancias.get(actual);
+//					double peso_acum_anterior = distancias.get(anterior);
+//
+//					if( peso_acum_actual >= peso_acum_anterior )
+//						camino_actual.remove(actual);
+//				}
+//			}
+//		}
 		
 		return camino_actual;
 	}
