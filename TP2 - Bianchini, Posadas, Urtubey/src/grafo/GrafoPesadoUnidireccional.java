@@ -98,28 +98,43 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 			}
 		}
 
-		//Quite la depuración porque es innecesaria.
-		
-//		for ( int i=1; i<camino_actual.size()-1; i++ ) {
-//			
-//			E anterior = camino_actual.get(i-1);
-//			E siguiente = camino_actual.get(i+1);
-//			E actual = camino_actual.get(i);
-//			
-//			if( existeArista(anterior, siguiente) ) {
-//				if( !existeArista(actual, siguiente) ){
-//					camino_actual.remove(actual);
-//				} else {
-//					double peso_acum_actual = distancias.get(actual);
-//					double peso_acum_anterior = distancias.get(anterior);
-//
-//					if( peso_acum_actual >= peso_acum_anterior )
-//						camino_actual.remove(actual);
-//				}
-//			}
-//		}
+		E nodo_sobrante;
+		while( (nodo_sobrante = getNodoSobrante(camino_actual, distancias) ) != null )
+			camino_actual.remove(nodo_sobrante);
 		
 		return camino_actual;
+	}
+	
+	private E getNodoSobrante(List<E> camino, HashMap<E, Double> distancias){
+		for(int i=1; i<camino.size()-1; i++){
+			
+			E anterior = camino.get(i-1);
+			E actual = camino.get(i);
+			E siguiente = camino.get(i+1);
+			
+			if( existeArista(anterior, siguiente) ){
+				if( !existeArista(actual, siguiente) ){
+					return actual;
+				} else {
+					List<E> con_actual = new ArrayList<E>(camino);
+					List<E> sin_actual = new ArrayList<E>(camino);
+					sin_actual.remove(actual);
+
+					double peso_acum_con_actual = calcularPeso(con_actual);
+					double peso_acum_sin_actual = calcularPeso(sin_actual);
+					if( peso_acum_sin_actual < peso_acum_con_actual )
+						return actual;
+				}
+			}
+		} return null;
+	}
+	
+	private double calcularPeso(List<E> camino){
+		double ret = 0.0;
+		for(int i=0; i<camino.size()-1; i++)
+			ret += this.getPeso(camino.get(i), camino.get(i+1));
+		return ret;
+		
 	}
 	
 	private boolean sePuedeLlegar(E origen, E destino){
@@ -150,6 +165,8 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 			}
 		} return ret;
 	}
+	
+	
 	
 	@Override
 	public String toString(){
