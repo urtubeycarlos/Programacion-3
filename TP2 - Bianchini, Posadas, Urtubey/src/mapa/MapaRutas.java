@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -50,7 +49,6 @@ public class MapaRutas implements Mapa {
 	
 	private double calcularDistancia(Coordenada c1, Coordenada c2){
 		return Math.sqrt( Math.pow(c2.getLatitud() - c1.getLatitud(), 2) + Math.pow(c2.getLongitud() - c1.getLongitud(), 2.0) );
-		//		return (Math.hypot((c2.getLatitud() - c2.getLatitud()), (c2.getLongitud() - c2.getLongitud())) * 1e-5);
 	}
 	
 	@Override
@@ -87,69 +85,38 @@ public class MapaRutas implements Mapa {
 		List<Coordenada> ret = new ArrayList<Coordenada>();
 		Set<Integer> destinos = new HashSet<Integer>();
 		ArrayList<Coordenada> referenciasCoordenadas = new ArrayList<Coordenada>();
-		MatrizCartesiana<Boolean> matrizPeajesCapas = new MatrizCartesiana<>( _grafoCiudades.getVertices().size() * (cantPeajesMax+1) , _grafoCiudades.getVertices().size() * (cantPeajesMax+1));
+//		MatrizCartesiana<Boolean> matrizPeajesCapas = new MatrizCartesiana<>( _grafoCiudades.getVertices().size() * (cantPeajesMax+1) , _grafoCiudades.getVertices().size() * (cantPeajesMax+1));
 		GrafoPesadoUnidireccional<Integer> grafoEnCapas = new GrafoPesadoUnidireccional<>();
-		
-		referenciasCoordenadas.addAll( _listaCoordenadas );
-		for( int i=0; i<cantPeajesMax; i++ ){
+	
+		referenciasCoordenadas.addAll( _listaCoordenadas ); //Se guarda las referencias a los vertices una vez.
+		for( int i=0; i<cantPeajesMax; i++ ){ //Se guardan n referencias a los vertices de nuevo, con n la cantidad de peajes maxima que quiero.
+											 //Tambien calcula los destinos.
 			referenciasCoordenadas.addAll( _listaCoordenadas );
+			destinos.add( _listaCoordenadas.indexOf(destino) + i*_grafoCiudades.cantVertices());
 		}
 
-		for( Integer vertice=0; vertice<referenciasCoordenadas.size(); vertice++ ){
+		//Agrega los vertices al grafo en capas
+		for( Integer vertice=0; vertice<referenciasCoordenadas.size(); vertice++ )
 			grafoEnCapas.agregarVertice(vertice);
-		}
-		
-		for( int i=0; i<=cantPeajesMax; i++ ){
-			destinos.add( _listaCoordenadas.indexOf(destino) + i*_grafoCiudades.cantVertices());
-		}
 		
 		
-		for( int capa=0; capa<=cantPeajesMax; capa++)
-		for( int i=0; i<_matrizPeajes.height(); i++ )
-		for( int j=0; j<_matrizPeajes.width(); j++ )
-			matrizPeajesCapas.set(i + capa*_grafoCiudades.getVertices().size(), j + capa*_grafoCiudades.getVertices().size(), _matrizPeajes.get(i, j));
 		
-		System.out.println(_matrizPeajes);
-		System.out.println(matrizPeajesCapas);
-		
-		
-//		int aristas_peajes_agregadas = 0;
-//		for( int i=0; i<cantPeajesMax; i++){
-//			for( Integer vertice:grafoEnCapas.getVertices() ){
-//				for( Integer vecino:grafoEnCapas.getVecinos(vertice) ){
-//				
-//				}
-//			}
-//		}
+		//Setea las aristas del grafo en capas segun la cantidad maxima de peajes.
+		for(int c=0; c<cantPeajesMax; c++){
 			
-		
-		
-		
-		for( int i=0; i<=cantPeajesMax; i++ ){
-			destinos.add( _listaCoordenadas.indexOf(destino) + i*_grafoCiudades.cantVertices());
-			for( int vertice:_grafoCiudades.getVertices() ) {
-				for( int vecino:_grafoCiudades.getVecinos(vertice) ) {
-					grafoEnCapas.agregarArista(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _grafoCiudades.getPeso(vertice, vecino));
-					matrizPeajesCapas.set(vertice + i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices(), _matrizPeajes.get(vertice, vecino));
-				}
-			}
+			for(Integer vertice:_grafoCiudades.getVertices())
+			for(Integer vecino:_grafoCiudades.getVecinos(vertice))
+				if(_grafoCiudades.existeArista(vertice, vecino))
+					if( !_matrizPeajes.get(vertice, vecino) )
+						grafoEnCapas.agregarArista( _grafoCiudades.cantVertices() * c + vertice, _grafoCiudades.cantVertices() * c + vecino, _grafoCiudades.getPeso(vertice, vecino) );
+					else if ( c < cantPeajesMax )
+						grafoEnCapas.agregarArista( _grafoCiudades.cantVertices() * c + vertice, _grafoCiudades.cantVertices() * ( c+1 ) + vecino, _grafoCiudades.getPeso(vertice, vecino) );
+			
 		}
 		
-		for( int i=0; i<=cantPeajesMax; i++ )
-		for( Integer vertice:_grafoCiudades.getVertices() )
-		for( Integer vecino:_grafoCiudades.getVecinos(vertice) )
-			if( matrizPeajesCapas.get(vertice, vecino) ){
-				if( i != cantPeajesMax ){
-					grafoEnCapas.agregarArista(vertice +  i*_grafoCiudades.cantVertices(), vecino + (i+1)*_grafoCiudades.cantVertices(), grafoEnCapas.getPeso(vertice +  i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices()) );
-					grafoEnCapas.eliminarArista(vertice +  i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices());
-				} else {
-					grafoEnCapas.eliminarArista(vertice +  i*_grafoCiudades.cantVertices(), vecino + i*_grafoCiudades.cantVertices());
-					if ( destinos.contains( vecino + i*_grafoCiudades.cantVertices() ) )
-						destinos.remove( vecino + i*_grafoCiudades.cantVertices() );
-				}
-			}
 		
-						
+		//Busca camino minimo con todos los posibles destino. Esta con un try porque puede 
+		//ser que no se pueda llegar y devuelva una excepcion.
 		List<ArrayList<Integer>> resultados = new ArrayList<ArrayList<Integer>>();
 		for( Integer dest:destinos ){
 			try {
@@ -159,7 +126,7 @@ public class MapaRutas implements Mapa {
 			}
 		}
 			
-		
+		//De los mejores caminos con todos los posibles destinos se busca cual es el mejor.
 		for( Integer indice:obtenerMejorResultado(resultados, grafoEnCapas) )
 			ret.add( referenciasCoordenadas.get(indice) );
 		return ret;
@@ -193,7 +160,7 @@ public class MapaRutas implements Mapa {
 		
 		for (Entry<Integer, Integer> entry : vecinosABorrar.entrySet())
 		{
-		    copiaGrafo.eliminarArista(entry.getKey(),entry.getValue());
+		    copiaGrafo.eliminarArista(entry.getKey(), entry.getValue());
 		}
 		
 		try {
