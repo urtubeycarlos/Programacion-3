@@ -112,19 +112,20 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 			E actual = camino.get(i);
 			E siguiente = camino.get(i+1);
 			
+			if( !existeArista(actual, siguiente) )
+				return actual;
+			
 			if( existeArista(anterior, siguiente) ){
-				if( !existeArista(actual, siguiente) ){
-					return actual;
-				} else {
-					List<E> con_actual = new ArrayList<E>(camino);
-					List<E> sin_actual = new ArrayList<E>(camino);
-					sin_actual.remove(actual);
+				
+				List<E> con_actual = new ArrayList<E>(camino);
+				List<E> sin_actual = new ArrayList<E>(camino);
+				sin_actual.remove(actual);
 
-					double peso_acum_con_actual = calcularPeso(con_actual);
-					double peso_acum_sin_actual = calcularPeso(sin_actual);
-					if( peso_acum_sin_actual < peso_acum_con_actual )
-						return actual;
-				}
+				double peso_acum_con_actual = calcularPeso(con_actual);
+				double peso_acum_sin_actual = calcularPeso(sin_actual);
+				if( peso_acum_sin_actual < peso_acum_con_actual )
+					return actual;
+				
 			}
 		} return null;
 	}
