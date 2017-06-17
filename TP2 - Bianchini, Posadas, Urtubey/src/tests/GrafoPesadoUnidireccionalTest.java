@@ -121,6 +121,30 @@ public class GrafoPesadoUnidireccionalTest {
 		assertEquals(resultado_esperado, g.obtenerCaminoMinimo(1, 4));
 	}
 	
+	@Test
+	public void testPrimerCaminoMasLargo(){
+		
+		GrafoPesadoUnidireccional<Integer> g = new GrafoPesadoUnidireccional<>();
+
+		List<Integer> resultado_esperado = new ArrayList<Integer>();
+		Integer[] vertices_esperados = new Integer[]{1, 5};
+		resultado_esperado.addAll( Arrays.asList(vertices_esperados) );
+		
+		g.agregarVertice(1);
+		g.agregarVertice(2);
+		g.agregarVertice(3);
+		g.agregarVertice(4);
+		g.agregarVertice(5);
+		
+		g.agregarArista(1, 2, 2.0);
+		g.agregarArista(1, 5, 4.0);
+		g.agregarArista(2, 3, 2.0);
+		g.agregarArista(3, 4, 2.0);
+		g.agregarArista(4, 5, 2.0);
+		
+		assertEquals(resultado_esperado, g.obtenerCaminoMinimo(1, 5));
+	}
+
 	@Test(expected=RuntimeException.class)
 	public void caminoImposibleTest(){
 		_grafo.agregarArista(0, 1);
