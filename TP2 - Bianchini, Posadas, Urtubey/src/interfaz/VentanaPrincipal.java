@@ -28,6 +28,8 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.JCheckBox;
 
@@ -284,10 +286,13 @@ public class VentanaPrincipal {
 
 	private void pasarDatosAlMapa() {
 		for (MapPolygon polygon: listaDePoligonosDelMapa){
+			System.out.println(listaDePoligonosDelMapa);
 			Coordenada coord1 = new Coordenada(null, polygon.getPoints().get(0).getLat(), polygon.getPoints().get(0).getLon());
 			Coordenada coord2 = new Coordenada(null, polygon.getPoints().get(1).getLat(), polygon.getPoints().get(1).getLon());
 			
 			boolean conPeaje = checkPolygonName(polygon);
+			
+			System.out.println(coord1);
 			
 			mapa.agregarCoordenada(coord1);
 			mapa.agregarCoordenada(coord2);
@@ -296,29 +301,32 @@ public class VentanaPrincipal {
 			mapa.agregarRuta(coord1, coord2, conPeaje);
 			mapa.agregarRuta(coord2, coord1, conPeaje);
 			
-			System.out.println(mapa.existeRuta(coord1, coord2));
-			System.out.println(mapa.existeRuta(coord2, coord1));
 			
 		}
-		System.out.println(mapa.getCoordenadas().toString());
 	}
 	
 	private ArrayList<Coordenada> obtenerCamino() {
 		Coordenada origen = new Coordenada("Inicio", this.puntoInicio.getLat(), this.puntoInicio.getLon()); 
 		Coordenada destino = new Coordenada("Destino", this.puntoDestino.getLat(), this.puntoDestino.getLon()); 
 		int cantPeajes = Integer.parseInt(campoPeajes.getText());
-		ArrayList<Coordenada> caminoMinimo = (ArrayList<Coordenada>) mapa.obtenerRutaOptima(origen, destino, cantPeajes);
-		return caminoMinimo;
+		try {
+			ArrayList<Coordenada> caminoMinimo = (ArrayList<Coordenada>) mapa.obtenerRutaOptima(origen, destino, cantPeajes);
+			return caminoMinimo;
+		}
+		catch (Exception e){
+			mostrarError(e.getMessage());
+		}
+		return null;
 	}
-	
+
 	private void dibujarCaminoMinimo(ArrayList<Coordenada> caminoMinimo) {
-		System.out.println("camino :"+caminoMinimo.toString());
-		for (int i=0;i<caminoMinimo.size()-1;i++){
-			
-			Coordinate inicio = new Coordinate(caminoMinimo.get(i).getLatitud(), caminoMinimo.get(i).getLongitud());
-			Coordinate destino = new Coordinate(caminoMinimo.get(i+1).getLatitud(), caminoMinimo.get(i+1).getLongitud());
-			dibujarLineaEntrePuntos(inicio, destino, Color.RED);
-			
+		if (caminoMinimo!=null){
+			System.out.println("camino :"+caminoMinimo.toString());
+			for (int i=0;i<caminoMinimo.size()-1;i++){
+				Coordinate inicio = new Coordinate(caminoMinimo.get(i).getLatitud(), caminoMinimo.get(i).getLongitud());
+				Coordinate destino = new Coordinate(caminoMinimo.get(i+1).getLatitud(), caminoMinimo.get(i+1).getLongitud());
+				dibujarLineaEntrePuntos(inicio, destino, Color.RED);
+			}
 		}
 	}
 
@@ -373,7 +381,7 @@ public class VentanaPrincipal {
 		map().removeAllMapPolygons();
 		this.listaDePoligonosDelMapa.clear();
 		
-		this.mapa = null;
+		this.mapa = new MapaRutas();
 	}
 	
 	/**
@@ -582,5 +590,10 @@ public class VentanaPrincipal {
 	private void actualizaPuntosYPoligonos(){
 		listaDePuntosDelMapa = map().getMapMarkerList();
 		listaDePoligonosDelMapa = map().getMapPolygonList();
+	}
+	
+	private void mostrarError(String message){
+		JOptionPane.showMessageDialog(frame, message);
+		
 	}
 }
