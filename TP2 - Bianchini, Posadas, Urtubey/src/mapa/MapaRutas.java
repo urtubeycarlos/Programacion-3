@@ -130,6 +130,7 @@ public class MapaRutas implements Mapa {
 		}
 			
 		//De los mejores caminos con todos los posibles destinos se busca cual es el mejor.
+		System.out.println(resultados);
 		for( Integer indice:obtenerMejorResultado(resultados, grafoEnCapas) )
 			ret.add( referenciasCoordenadas.get(indice) );
 		return ret;
@@ -154,6 +155,8 @@ public class MapaRutas implements Mapa {
 	}
 	
 	private List<Coordenada> obtenerRutaOptimaSinPeajes(Coordenada origen, Coordenada destino){
+		
+		//FIXME: Hay que arreglar la logica de este.
 		
 		GrafoPesadoUnidireccional<Integer> copiaGrafo = _grafoCiudades.clonar();
 		List<Integer> resultado;
