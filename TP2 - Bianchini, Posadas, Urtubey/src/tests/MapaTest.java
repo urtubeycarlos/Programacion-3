@@ -25,16 +25,20 @@ public class MapaTest {
 		m = new MapaRutas();
 		
 		coordenadas = new Coordenada[]{
-				new Coordenada("Springfield", 510.0, 213.0), 
-				new Coordenada("Shelbyville", 310.0, 220.0), 
-				new Coordenada("Ciudad Gritos", 666.0, 123.0)
+				new Coordenada("Springfield", 37.579412513438385, -46.0546875), 
+				new Coordenada("Shelbyville", 60.500525410511315, -27.7734375), 
+				new Coordenada("Ciudad Gritos", 52.696361078274485, -18.6328125),
+				new Coordenada("New York", 59.5343180010956, -0.87890625), 
+				new Coordenada("Ciudad Capital", 44.465151013519616, 39.0234375),
 		};
 		
 		m.agregarCoordenadas( Arrays.asList(coordenadas) );
 		
 		m.agregarRuta(coordenadas[0], coordenadas[1], false);
-		m.agregarRuta(coordenadas[1], coordenadas[2], true);
-		m.agregarRuta(coordenadas[0], coordenadas[2], false);
+		m.agregarRuta(coordenadas[1], coordenadas[2], false);
+		m.agregarRuta(coordenadas[2], coordenadas[3], false);
+		m.agregarRuta(coordenadas[3], coordenadas[4], false);
+		m.agregarRuta(coordenadas[4], coordenadas[0], false);
 	
 	}
 
@@ -82,12 +86,13 @@ public class MapaTest {
 	public void obtenerRutaOptimaTest() {
 		Coordenada[] coordenas_esperadas = new Coordenada[]{
 				coordenadas[0],
-				coordenadas[2]
+				coordenadas[4]
 		};
-		
+		List<Coordenada> camin = m.obtenerRutaOptima(coordenadas[0], coordenadas[4], 5);
+		System.out.println(camin);
 		List<Coordenada> resultado_esperado = new ArrayList<Coordenada>( Arrays.asList(coordenas_esperadas) );
 
-		assertEquals(resultado_esperado, m.obtenerRutaOptima(coordenadas[0], coordenadas[2], 1));
+		assertEquals(resultado_esperado, camin);
 
 	}
 	
