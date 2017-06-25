@@ -131,4 +131,37 @@ public class MapaTest {
 		m2.obtenerRutaOptima(coordenadas[0], coordenadas[2], 0);
 	}
 
+	@Test
+	public void testRutaM(){
+		
+		MapaRutas m3 = new MapaRutas();
+		
+		coordenadas = new Coordenada[]{
+				new Coordenada("A", 37.579412513438385, -46.0546875),
+				new Coordenada("B", 60.500525410511315, -27.7734375),
+				new Coordenada("C", 52.696361078274485, -18.6328125),
+				new Coordenada("D", 59.5343180010956, -0.87890625),
+				new Coordenada("E", 44.465151013519616, 39.0234375),
+		};
+		
+		m3.agregarCoordenadas( Arrays.asList(coordenadas) );
+			
+		m3.agregarRuta(coordenadas[0], coordenadas[1], false);
+		m3.agregarRuta(coordenadas[1], coordenadas[2], false);
+		m3.agregarRuta(coordenadas[2], coordenadas[3], false);
+		m3.agregarRuta(coordenadas[0], coordenadas[4], false);
+		
+		
+		
+		Coordenada[] coordenas_esperadas = new Coordenada[]{
+				coordenadas[0],
+				coordenadas[4]
+		};
+		
+		List<Coordenada> resultado_esperado = new ArrayList<Coordenada>( Arrays.asList(coordenas_esperadas) );
+		
+		assertEquals(resultado_esperado, m3.obtenerRutaOptima(coordenadas[0], coordenadas[4]));
+		
+	}
+	
 }

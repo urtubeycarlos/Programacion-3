@@ -1,5 +1,6 @@
 package mapa;
 
+import java.io.LineNumberInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +38,7 @@ public class MapaRutas implements Mapa {
 
 	@Override
 	public void agregarRuta(Coordenada c1, Coordenada c2, boolean tienePeaje) {
+		
 		Integer indC1 = _listaCoordenadas.indexOf(c1);
 		Integer indC2 = _listaCoordenadas.indexOf(c2);
 		
