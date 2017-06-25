@@ -78,7 +78,7 @@ public class MapaRutas implements Mapa {
 	@Override
 	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino, int cantPeajesMax) {
 
-		if( cantPeajesMax > cantPeajes() )
+		if( cantPeajesMax >= cantPeajes() )
 			return obtenerRutaOptima(origen, destino);
 		
 		if( cantPeajesMax == 0 )
