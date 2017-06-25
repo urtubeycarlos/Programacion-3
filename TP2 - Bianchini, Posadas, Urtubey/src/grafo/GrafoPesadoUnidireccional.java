@@ -3,6 +3,7 @@ package grafo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -81,14 +82,27 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 			distancias.put(vertice, Double.POSITIVE_INFINITY);
 		distancias.put(origen, 0.0);
 		
-		List<E> camino_actual = new ArrayList<E>();
+		List<E> camino_actual = new LinkedList<E>();
 		Set<E> visitados = new HashSet<E>();
 		
 		while( !visitados.contains(destino) ){
 			
 			nodo_actual = obtenerMenor(distancias, visitados); 
+			
+			if( camino_actual.isEmpty() )
+				camino_actual.add(nodo_actual);
+			else {
+				for(int i=0; i<camino_actual.size(); i++){
+					E nodo = camino_actual.get(i);
+					if( !camino_actual.contains(nodo_actual) && !nodo.equals(nodo_actual) && existeArista(nodo, nodo_actual) )
+						camino_actual.add(i+1, nodo_actual);
+				}
+					
+			}
+			
 			visitados.add(nodo_actual);
-			camino_actual.add(nodo_actual);
+			
+			
 
 			for( E nodo_j:super.getVecinos(nodo_actual) ) if( nodo_j != null && !visitados.contains(nodo_j) ){
 				Double calc_distancia = distancias.get(nodo_actual) + getPeso(nodo_actual, nodo_j);
@@ -98,10 +112,15 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 			}
 		}
 
-		E nodo_sobrante;
-		while( (nodo_sobrante = getNodoSobrante(camino_actual, distancias) ) != null )
-			camino_actual.remove(nodo_sobrante);
+		camino_actual = camino_actual.subList(0, camino_actual.indexOf(destino)+1);
+		System.out.println( "Camino: " + camino_actual );
 		
+//		E nodo_sobrante;
+//		while( (nodo_sobrante = getNodoSobrante(camino_actual, distancias) ) != null )
+//			camino_actual.remove(nodo_sobrante);
+//		
+//		System.out.println( "Camino despues de depurar: " + camino_actual );
+//		
 		return camino_actual;
 	}
 	
