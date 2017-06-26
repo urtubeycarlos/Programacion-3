@@ -125,11 +125,11 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 					}
 				}
 			}
-			
 		}
 		
 		Nodo n = nodo_actual;
-		do {
+		do 
+		{
 			camino.addFirst( n.val );
 			n = n.padre;
 		} while ( n != null );

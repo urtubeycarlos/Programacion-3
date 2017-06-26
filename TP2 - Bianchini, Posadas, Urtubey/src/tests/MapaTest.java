@@ -154,6 +154,7 @@ public class MapaTest {
 		m3.agregarRuta(coordenadas[0], coordenadas[1], false);
 		m3.agregarRuta(coordenadas[1], coordenadas[2], false);
 		m3.agregarRuta(coordenadas[2], coordenadas[3], false);
+		m3.agregarRuta(coordenadas[3], coordenadas[4], false);
 		m3.agregarRuta(coordenadas[0], coordenadas[4], true);
 		
 		
@@ -167,9 +168,20 @@ public class MapaTest {
 		
 		assertEquals(resultado_esperado, m3.obtenerRutaOptima(coordenadas[0], coordenadas[4]));
 		assertEquals(resultado_esperado, m3.obtenerRutaOptima(coordenadas[0], coordenadas[4], 2));
-//		System.out.println( m3.obtenerRutaOptima(coordenadas[0], coordenadas[4], 0) ); //La logica de esto esta mal.
 		assertEquals(resultado_esperado, m3.obtenerRutaOptima(coordenadas[0], coordenadas[4], 1)); 
-		//Dibujar el grafo en papel y ver porque lo hace mal, los resultados estan vacios cuando hace caminimo minimo.
+		
+		Coordenada[] coordenadas_esperadas = new Coordenada[]{
+				coordenadas[0],
+				coordenadas[1],
+				coordenadas[2],
+				coordenadas[3],
+				coordenadas[4]
+		};
+		
+		resultado_esperado = new ArrayList<Coordenada>( Arrays.asList( coordenadas_esperadas ) );
+		
+		assertEquals( resultado_esperado, m3.obtenerRutaOptima(coordenadas[0], coordenadas[4], 0) );
+		
 	}
 	
 }

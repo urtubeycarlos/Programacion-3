@@ -1,10 +1,8 @@
 package mapa;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import grafo.GrafoPesadoUnidireccional;
@@ -18,7 +16,7 @@ public class MapaRutas implements Mapa {
 
 	public MapaRutas(){
 		_grafoCiudades = new GrafoPesadoUnidireccional<Integer>();
-		_matrizPeajes = new MatrizCartesiana<Boolean>(1, 1);
+		_matrizPeajes = new MatrizCartesiana<Boolean>(16, 16);
 		_listaCoordenadas = new ArrayList<Coordenada>();
 	}
 	
@@ -41,8 +39,8 @@ public class MapaRutas implements Mapa {
 		Integer indC1 = _listaCoordenadas.indexOf(c1);
 		Integer indC2 = _listaCoordenadas.indexOf(c2);
 		
-		if( indC1 >= _matrizPeajes.width() || indC2 >= _matrizPeajes.height() )
-			_matrizPeajes.resize( _matrizPeajes.width()+1 , _matrizPeajes.height()+1);
+		if( indC1 >= _matrizPeajes.width()-1 || indC2 >= _matrizPeajes.height()-1 )
+			_matrizPeajes.resize( _matrizPeajes.width()*2 , _matrizPeajes.height()*2 );
 		
 		_grafoCiudades.agregarArista(indC1, indC2, calcularDistancia(c1, c2));
 		_matrizPeajes.set(indC1, indC2, tienePeaje);
@@ -129,7 +127,6 @@ public class MapaRutas implements Mapa {
 		}
 			
 		//De los mejores caminos con todos los posibles destinos se busca cual es el mejor.
-		System.out.println(resultados);
 		for( Integer indice:obtenerMejorResultado(resultados, grafoEnCapas) )
 			ret.add( referenciasCoordenadas.get(indice) );
 		return ret;
@@ -155,23 +152,14 @@ public class MapaRutas implements Mapa {
 	
 	private List<Coordenada> obtenerRutaOptimaSinPeajes(Coordenada origen, Coordenada destino){
 		
-		//FIXME: Hay que arreglar la logica de este.
-		
 		GrafoPesadoUnidireccional<Integer> copiaGrafo = _grafoCiudades.clonar();
 		List<Integer> resultado;
 		List<Coordenada> ret = new ArrayList<Coordenada>();
 		
-		HashMap<Integer, Integer> vecinosABorrar = new HashMap<>();
 		for( Integer vertice:copiaGrafo.getVertices() ) //posible problema: iterando sobre lista y eliminando objetos de ella
 		for( Integer vecino:copiaGrafo.getVecinos(vertice) )
 			if( _matrizPeajes.get(vertice, vecino) )
-				vecinosABorrar.put(vertice, vecino);
-				//copiaGrafo.eliminarArista(vertice, vecino);
-		
-		for (Entry<Integer, Integer> entry : vecinosABorrar.entrySet())
-		{
-		    copiaGrafo.eliminarArista(entry.getKey(), entry.getValue());
-		}
+				copiaGrafo.eliminarArista(vertice, vecino);
 		
 		try {
 			resultado = copiaGrafo.obtenerCaminoMinimo( _listaCoordenadas.indexOf(origen), _listaCoordenadas.indexOf(destino) );
