@@ -1,18 +1,10 @@
 package interfaz;
-import mapa.Coordenada;
-import mapa.MapaRutas;
-
+import java.awt.Color;
 import java.awt.EventQueue;
-import java.util.List;
-import java.awt.Point;
-import java.awt.Polygon;
-
 import javax.swing.JFrame;
 
 import org.openstreetmap.gui.jmapviewer.*;
-import org.openstreetmap.gui.jmapviewer.interfaces.ICoordinate;
 import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
-import org.openstreetmap.gui.jmapviewer.interfaces.MapPolygon;
 
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
@@ -21,8 +13,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.awt.event.ActionEvent;
-import java.awt.Color;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -31,31 +23,27 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
+import java.awt.Point;
+
 import javax.swing.JCheckBox;
 
 public class VentanaPrincipal {
 	
 	private JFrame frame;
-	private JMapViewerTree mapViewerTree;
+	private static JMapViewerTree mapViewerTree;
 	private final ButtonGroup botonesDelPanel = new ButtonGroup();
 	
-	Point posicionActualFrame;
-	Coordinate posicionActualMapa;
-	ArrayList<MapMarker> puntosSeleccionados;
-	List<MapMarker> listaDePuntosDelMapa;
-	List<MapPolygon> listaDePoligonosDelMapa;
-	boolean peaje = false;
-	
-	// Trabajamos con coordinates para que sea mas agil la imple del jmap.
-	MapaRutas mapa = new MapaRutas();
-	ArrayList<Coordinate> listaDeCoordenadas;
-	Coordinate puntoInicio;
-	Coordinate puntoDestino;
 	private JTextField campoInicio;
 	private JTextField campoCoord1;
 	private JTextField campoDestino;
 	private JTextField campoCoord2;
 	private JTextField campoPeajes;
+	
+	ArrayList<MapMarker> puntosSeleccionados;
+	static Point posicionActualFrame;
+	static Coordinate posicionActualMapa;
+	
+	private Interfaz interfaz;
 	
 	/**
 	 * Launch the application.
@@ -84,40 +72,37 @@ public class VentanaPrincipal {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		posicionActualFrame = new Point();
-		posicionActualMapa = new Coordinate(0, 0);
+		interfaz = new Interfaz();
 		puntosSeleccionados = new ArrayList<>();
 		
-		listaDeCoordenadas = new ArrayList<>();
-				
 		frame = new JFrame();
 		frame.setBounds(100, 100, 970, 592);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
 		JButton btnAgregarPunto = new JButton("Agregar Puntos");
-		botonesDelPanel.add(btnAgregarPunto);
+		getBotonesDelPanel().add(btnAgregarPunto);
 		btnAgregarPunto.setBounds(24, 420, 150, 23);
 		frame.getContentPane().add(btnAgregarPunto);
 		
 		JButton btnQuitarPunto = new JButton("Quitar Puntos");
-		botonesDelPanel.add(btnQuitarPunto);
+		getBotonesDelPanel().add(btnQuitarPunto);
 		btnQuitarPunto.setBounds(24, 454, 150, 23);
 		frame.getContentPane().add(btnQuitarPunto);
 		
 		JButton btnAgregarRuta = new JButton("Conectar Puntos");
-		botonesDelPanel.add(btnAgregarRuta);
+		getBotonesDelPanel().add(btnAgregarRuta);
 		btnAgregarRuta.setBounds(24, 488, 150, 23);
 		frame.getContentPane().add(btnAgregarRuta);
 		
 		JButton btnInicio = new JButton("Marcar inicio");
-		botonesDelPanel.add(btnInicio);
+		getBotonesDelPanel().add(btnInicio);
 		btnInicio.setBounds(284, 420, 150, 23);
 		frame.getContentPane().add(btnInicio);
 		
 		JButton btnDestino = new JButton("Marcar destino");
-		botonesDelPanel.add(btnDestino);
-		btnDestino.setBounds(697, 420, 150, 23);
+		getBotonesDelPanel().add(btnDestino);
+		btnDestino.setBounds(444, 420, 150, 23);
 		frame.getContentPane().add(btnDestino);
 		
 		campoInicio = new JTextField();
@@ -167,7 +152,7 @@ public class VentanaPrincipal {
 		frame.getContentPane().add(btnBorrarTodo);
 		
 		JButton btnObtenerCamino = new JButton("Obtener Camino Minimo");
-		btnObtenerCamino.setBounds(444, 420, 150, 23);
+		btnObtenerCamino.setBounds(697, 420, 150, 23);
 		frame.getContentPane().add(btnObtenerCamino);
 		
 		JCheckBox chckbxPeaje = new JCheckBox("Peaje");
@@ -188,34 +173,33 @@ public class VentanaPrincipal {
 		mapViewerTree = new JMapViewerTree("Map");
 		mapViewerTree.setBounds(10, 10, 930, 400);
 		frame.getContentPane().add(mapViewerTree);
+		JMapViewer map = mapViewerTree.getViewer();
 		
 		// Action listeners
-		chckbxPeaje.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (!peaje)
-					peaje = true;
-				else
-					peaje = false;
-			}
-		});
 		btnObtenerCamino.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				obtenerCaminoMinimo();
+				try{
+					interfaz.obtenerCaminoMinimo(map, campoPeajes, chckbxPeaje);
+					habilitarBotones(false);
+				}
+				catch (Exception exception){
+					mostrarError(exception.getMessage());
+				}
 			}
 		});
 		btnBorrarTodo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				limpiarPuntos();
-				map().removeAllMapMarkers();
-				map().removeAllMapPolygons();
+				interfaz.limpiarPuntos(map, campoInicio, campoDestino);
+				map.removeAllMapMarkers();
+				habilitarBotones(true);
 			}
 		});
 		btnLimpiar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				limpiarPuntos();
+				interfaz.limpiarPuntos(map, campoInicio, campoDestino);
+				habilitarBotones(true);
 			}
 		});
 		btnAgregarPunto.addActionListener(new ActionListener() {
@@ -249,97 +233,48 @@ public class VentanaPrincipal {
 		});
 		
 		// Mouse listeners
-		map().addMouseMotionListener(new MouseAdapter() {
+		map.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
                 posicionActualFrame = e.getPoint();
-                posicionActualMapa = map().getPosition(posicionActualFrame);
-                map().setToolTipText(map().getPosition(e.getPoint()).toString());
-                campoCoord2.setText(round(posicionActualMapa.getLat(), 4) +"; "+ round(posicionActualMapa.getLon(), 4));
+                posicionActualMapa = map.getPosition(posicionActualFrame);
+                map.setToolTipText(map.getPosition(e.getPoint()).toString());
+                campoCoord2.setText(
+                		Interfaz.round(posicionActualMapa.getLat(), 4) +
+                		"; "+ 
+                		Interfaz.round(posicionActualMapa.getLon(), 4));
             }
         });
 		
-		map().addMouseListener(new MouseAdapter() {
+		map.addMouseListener(new MouseAdapter() {
 			@Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
                 	if (btnAgregarPunto.isSelected()){
-                		agregarPunto();
+                		interfaz.agregarPunto(map, campoCoord1, posicionActualMapa);
                 	}
                 	if (btnQuitarPunto.isSelected()){
-                		eliminarPunto();
+                		interfaz.eliminarPunto(map, campoInicio, campoDestino);
                 	}
-                	escucharSeleccionDePuntos(btnAgregarRuta, btnInicio, btnDestino);
+                	escucharSeleccionDePuntos(map, btnAgregarRuta, btnInicio, btnDestino, chckbxPeaje);
                 }
             }
         });
 	}
-	
-	//Metodos
-	private void obtenerCaminoMinimo(){
-		actualizaPuntosYPoligonos();
-		
-		pasarDatosAlMapa();
-		ArrayList<Coordenada> caminoMinimo = obtenerCamino();
-		dibujarCaminoMinimo(caminoMinimo);
+
+	public ButtonGroup getBotonesDelPanel() {
+		return botonesDelPanel;
 	}
 
-	private void pasarDatosAlMapa() {
-		for (MapPolygon polygon: listaDePoligonosDelMapa){
-			System.out.println(listaDePoligonosDelMapa);
-			Coordenada coord1 = new Coordenada(null, polygon.getPoints().get(0).getLat(), polygon.getPoints().get(0).getLon());
-			Coordenada coord2 = new Coordenada(null, polygon.getPoints().get(1).getLat(), polygon.getPoints().get(1).getLon());
-			
-			boolean conPeaje = checkPolygonName(polygon);
-			
-			System.out.println(coord1);
-			
-			mapa.agregarCoordenada(coord1);
-			mapa.agregarCoordenada(coord2);
-			
-			
-			mapa.agregarRuta(coord1, coord2, conPeaje);
-			mapa.agregarRuta(coord2, coord1, conPeaje);
-			
-			
-		}
-	}
-	
-	private ArrayList<Coordenada> obtenerCamino() {
-		Coordenada origen = new Coordenada("Inicio", this.puntoInicio.getLat(), this.puntoInicio.getLon()); 
-		Coordenada destino = new Coordenada("Destino", this.puntoDestino.getLat(), this.puntoDestino.getLon()); 
-		int cantPeajes = Integer.parseInt(campoPeajes.getText());
-		try {
-			ArrayList<Coordenada> caminoMinimo = (ArrayList<Coordenada>) mapa.obtenerRutaOptima(origen, destino, cantPeajes);
-			return caminoMinimo;
-		}
-		catch (Exception e){
-			mostrarError(e.getMessage());
-		}
-		return null;
-	}
-
-	private void dibujarCaminoMinimo(ArrayList<Coordenada> caminoMinimo) {
-		if (caminoMinimo!=null){
-			System.out.println("camino :"+caminoMinimo.toString());
-			for (int i=0;i<caminoMinimo.size()-1;i++){
-				Coordinate inicio = new Coordinate(caminoMinimo.get(i).getLatitud(), caminoMinimo.get(i).getLongitud());
-				Coordinate destino = new Coordinate(caminoMinimo.get(i+1).getLatitud(), caminoMinimo.get(i+1).getLongitud());
-				dibujarLineaEntrePuntos(inicio, destino, Color.RED);
-			}
-		}
-	}
-
-	private boolean checkPolygonName(MapPolygon polygon) {
-		if (polygon.getName()!=null)
-			return true;
-		return false;
+	private static JMapViewer map(){
+		return mapViewerTree.getViewer();
 	}
 	
 	/**
 	 * Generaliza el actionPerformed de los botones
+	 * @param botones 
 	 */
-	public void myActionPerformed(ActionEvent action, JButton button) {
+	private void myActionPerformed(ActionEvent action, JButton button) {
 		
 		if (button.isSelected()){
 			button.setSelected(false);
@@ -353,84 +288,44 @@ public class VentanaPrincipal {
 		}
 	}
 	
-	/**
-	 *  Jmap getter. devuelve el visor del mapa con todos sus metodos
-	 */
-	private JMapViewer map() {
-        return mapViewerTree.getViewer();
-    }
-
-	private void limpiarPuntos(){
-		actualizaPuntosYPoligonos();
-		ArrayList<MapMarker> listaDePuntosAQuitar = new ArrayList<>();
-		ArrayList<MapMarker> listaDePuntosAReemplazar = new ArrayList<>();
-		for (MapMarker punto: listaDePuntosDelMapa){
-			if (punto.getName()!=null){
-				listaDePuntosAQuitar.add(punto);
-
-				MapMarkerDot puntoDeReemplazo = new MapMarkerDot(punto.getCoordinate());
-				puntoDeReemplazo.setBackColor(Color.BLUE);
-				listaDePuntosAReemplazar.add(puntoDeReemplazo);
-			}
+	private void escucharSeleccionDePuntos(JMapViewer map, JButton agregarRuta, JButton agregarInicio, JButton agregarDestino, JCheckBox chckbxPeaje){
+		if (agregarRuta.isSelected()){
+			seleccionandoRuta(chckbxPeaje);
 		}
-		for (MapMarker punto: listaDePuntosAReemplazar){
-			listaDeCoordenadas.add(punto.getCoordinate());
-			map().addMapMarker(punto);
+		else if (agregarInicio.isSelected()){
+			interfaz.agregarPuntoDeInicio(map, campoInicio, posicionActualMapa);
 		}
-		borraPuntos(listaDePuntosAQuitar);
-		map().removeAllMapPolygons();
-		this.listaDePoligonosDelMapa.clear();
-		
-		this.mapa = new MapaRutas();
+		else if (agregarDestino.isSelected()){
+			interfaz.agregarPuntoDestino(map, campoDestino, posicionActualMapa);
+		}
+		else{
+			deseleccionarPuntos();
+		}
 	}
 	
 	/**
-	 * Se añade al mapa un punto nuevo
+	 * Este metodo agrega puntos a la seleccion de ruta. Cuando esta se completa,
+	 * dibuja una linea entre ellos.
+	 * @param chckbxPeaje 
 	 */
-	private void agregarPunto(){
-		MapMarkerDot nuevoPunto = new MapMarkerDot(posicionActualMapa);
-		nuevoPunto.setBackColor(Color.BLUE);
-		map().addMapMarker(nuevoPunto);
-		this.listaDeCoordenadas.add(nuevoPunto.getCoordinate());
-		campoCoord1.setText(round(posicionActualMapa.getLat(), 4) +"; "+ round(posicionActualMapa.getLon(), 4));
-	}
-	
-	/**
-	 * Si el boton quitar puntos esta seleccionado, cada vez que se hace click en un punto
-	 * este se borra junto con las aristas que salen de el.
-	 */
-	private void eliminarPunto(){
-		actualizaPuntosYPoligonos();
-		ArrayList<MapMarker> listaDePuntosAQuitar = new ArrayList<>();
-		ArrayList<MapPolygon> listaDePoligonosAQuitar = new ArrayList<>();
-		for (MapMarker punto: listaDePuntosDelMapa){
-			if (fueClickeado(punto)){
-				listaDePuntosAQuitar.add(punto);
-				for (MapPolygon polygon: listaDePoligonosDelMapa)
-					for (ICoordinate coordinate : polygon.getPoints())
-						if (punto.getCoordinate().equals(coordinate))
-							listaDePoligonosAQuitar.add(polygon);
+	private void seleccionandoRuta(JCheckBox chckbxPeaje) {
+		for (MapMarker punto: map().getMapMarkerList()){
+
+			if (fueClickeado(punto) && !puntosSeleccionados.contains(punto)){
+				this.puntosSeleccionados.add(punto);
+				campoCoord1.setText(Interfaz.round(posicionActualMapa.getLat(), 4) +"; "+ Interfaz.round(posicionActualMapa.getLon(), 4));
 			}
 		}
-		borrarPoligonos(listaDePoligonosAQuitar);
-		borraPuntos(listaDePuntosAQuitar);
-	}
-
-	private void borrarPoligonos(ArrayList<MapPolygon> listaDePoligonosAQuitar) {
-		for (MapPolygon polygon: listaDePoligonosAQuitar){
-			map().removeMapPolygon(polygon);
+		if (this.puntosSeleccionados.size()>=2){
+			dibujarLineaEntrePuntosSeleccionados(chckbxPeaje);
+			deseleccionarPuntos();
 		}
 	}
-
-	private void borraPuntos(ArrayList<MapMarker> listaDePuntosAQuitar) {
-		for (MapMarker punto: listaDePuntosAQuitar){
-			map().removeMapMarker(punto);
-			this.listaDeCoordenadas.remove(punto.getCoordinate());
-			if (punto.getName() != null && punto.getName().equals("Inicio"))
-				{this.puntoInicio = null; campoInicio.setText("");}
-			if (punto.getName() != null && punto.getName().equals("Destino"))
-				{this.puntoDestino = null; campoDestino.setText("");}
-		}
+	
+	private void dibujarLineaEntrePuntosSeleccionados(JCheckBox chckbxPeaje) {
+		Coordinate inicio = this.puntosSeleccionados.get(0).getCoordinate();
+		Coordinate destino = this.puntosSeleccionados.get(1).getCoordinate();
+		dibujarLineaEntrePuntos(inicio, destino, null, chckbxPeaje, map());
 	}
 	
 	private void deseleccionarBotones() {
@@ -442,51 +337,24 @@ public class VentanaPrincipal {
 		}
 	}
 	
-	private void escucharSeleccionDePuntos(JButton agregarRuta, JButton agregarInicio, JButton agregarDestino){
-		if (agregarRuta.isSelected()){
-			seleccionandoRuta();
-		}
-		else if (agregarInicio.isSelected()){
-			agregarPuntoDeInicio();
-		}
-		else if (agregarDestino.isSelected()){
-			agregarPuntoDestino();
-		}
-		else{
-			deseleccionarPuntos();
+	private void habilitarBotones(boolean flag){
+		Enumeration<AbstractButton> botones = botonesDelPanel.getElements();
+		while (botones.hasMoreElements()){
+			JButton botonActual = (JButton) botones.nextElement();
+			botonActual.setEnabled(flag);
 		}
 	}
-
-	/**
-	 * Este metodo agrega puntos a la seleccion de ruta. Cuando esta se completa,
-	 * dibuja una linea entre ellos.
-	 */
-	private void seleccionandoRuta() {
-		actualizaPuntosYPoligonos();
-		for (MapMarker punto: listaDePuntosDelMapa){
-
-			if (fueClickeado(punto) && !puntosSeleccionados.contains(punto)){
-				this.puntosSeleccionados.add(punto);
-				campoCoord1.setText(round(posicionActualMapa.getLat(), 4) +"; "+ round(posicionActualMapa.getLon(), 4));
-			}
-		}
-		if (this.puntosSeleccionados.size()>=2){
-			dibujarLineaEntrePuntosSeleccionados();
-			deseleccionarPuntos();
-		}
+	
+	private void deseleccionarPuntos() {
+		if (this.puntosSeleccionados != null)
+			this.puntosSeleccionados.clear();
 	}
-
-	private void dibujarLineaEntrePuntosSeleccionados() {
-		Coordinate inicio = this.puntosSeleccionados.get(0).getCoordinate();
-		Coordinate destino = this.puntosSeleccionados.get(1).getCoordinate();
-		dibujarLineaEntrePuntos(inicio, destino, null);
-	}
-
-	private void dibujarLineaEntrePuntos(Coordinate inicio, Coordinate destino, Color color) {
+	
+	static void dibujarLineaEntrePuntos(Coordinate inicio, Coordinate destino, Color color, JCheckBox chckbxPeaje, JMapViewer map) {
 		List<Coordinate> ruta = new ArrayList<Coordinate>(Arrays.asList(inicio, destino, destino));
 		MapPolygonImpl rutaMap = new MapPolygonImpl(ruta);
 		// bug
-		if (peaje && color==null){
+		if (chckbxPeaje.isSelected() && color==null){
 			rutaMap.setName("Peaje");
 			rutaMap.setColor(Color.MAGENTA);
 		}
@@ -495,54 +363,14 @@ public class VentanaPrincipal {
 		}
 		else
 			rutaMap.setColor(Color.GREEN);
-		map().addMapPolygon(rutaMap);
+		map.addMapPolygon(rutaMap);
 	}
 	
-	private void deseleccionarPuntos() {
-		if (this.puntosSeleccionados != null)
-			this.puntosSeleccionados.clear();
-	}
-	
-	private void agregarPuntoDeInicio(){
-		actualizaPuntosYPoligonos();
-		for (MapMarker punto: listaDePuntosDelMapa){
-
-			if (fueClickeado(punto) && this.puntoInicio == null){
-				this.puntoInicio = new Coordinate(punto.getLat(), punto.getLon());
-				map().removeMapMarker(punto);
-
-				MapMarkerDot puntoInicialMapa = new MapMarkerDot("Inicio", puntoInicio);
-				puntoInicialMapa.setBackColor(Color.RED);
-
-				map().addMapMarker(puntoInicialMapa);
-				campoInicio.setText(round(posicionActualMapa.getLat(), 4) +"; "+ round(posicionActualMapa.getLon(), 4));
-				break;
-			}
-		}
-	}
-	
-	private void agregarPuntoDestino(){
-		actualizaPuntosYPoligonos();
-		for (MapMarker punto: listaDePuntosDelMapa){
-			if (fueClickeado(punto) && this.puntoDestino == null){
-				this.puntoDestino = new Coordinate(punto.getLat(), punto.getLon());
-				map().removeMapMarker(punto);
-
-				MapMarkerDot puntoDestinoMapa = new MapMarkerDot("Destino", puntoDestino);
-				puntoDestinoMapa.setBackColor(Color.YELLOW);
-
-				map().addMapMarker(puntoDestinoMapa);
-				campoDestino.setText(round(posicionActualMapa.getLat(), 4) +"; "+ round(posicionActualMapa.getLon(), 4));
-				break;
-			}
-		}
-	}
 	/**
 	 * Este metodo chequea si un punto marcado en el mapa esta siendo clickeado por el mouse.
 	 * @param punto Es un MapMarker proveniente del JMapViewer
-	 * @return boolean
 	 */
-	private boolean fueClickeado(MapMarker punto){
+	static boolean fueClickeado(MapMarker punto){
 		/*
 		 * La funcion toma la coordenada del JFrame del mouse, y calcula un punto ficticio alrededor del mismo
 		 * al cual se le llama tolerancia. Este se obtiene de sumarle a la coordenada del mouse el radio del
@@ -578,22 +406,12 @@ public class VentanaPrincipal {
 		
 	}
 	
-	public static double round(double value, int places) {
-	    if (places < 0) throw new IllegalArgumentException();
-
-	    long factor = (long) Math.pow(10, places);
-	    value = value * factor;
-	    long tmp = Math.round(value);
-	    return (double) tmp / factor;
-	}
-	
-	private void actualizaPuntosYPoligonos(){
-		listaDePuntosDelMapa = map().getMapMarkerList();
-		listaDePoligonosDelMapa = map().getMapPolygonList();
-	}
-	
 	private void mostrarError(String message){
 		JOptionPane.showMessageDialog(frame, message);
-		
 	}
+	
+	
+	
+	
+	
 }
