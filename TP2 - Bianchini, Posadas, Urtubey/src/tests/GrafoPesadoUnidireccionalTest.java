@@ -5,10 +5,7 @@ import static org.junit.Assert.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -94,7 +91,7 @@ public class GrafoPesadoUnidireccionalTest {
 		GrafoPesadoUnidireccional<Integer> g = new GrafoPesadoUnidireccional<>();
 
 		List<Integer> resultado_esperado = new ArrayList<Integer>();
-		Integer[] vertices_esperados = new Integer[]{1, 2, 3, 4};
+		Integer[] vertices_esperados = new Integer[]{1, 2, 5, 4};
 		resultado_esperado.addAll( Arrays.asList(vertices_esperados) );
 		
 		g.agregarVertice(1);
@@ -103,7 +100,9 @@ public class GrafoPesadoUnidireccionalTest {
 		g.agregarVertice(4);
 		g.agregarVertice(5);
 		g.agregarVertice(6);
-		
+		// 1234 : 4 + 3 + 4 = 11
+		// 1254 : 4 + 1 + 4 = 9 
+		// 134: 8 + 4 = 12
 		g.agregarArista(1, 2, 4.0);
 		g.agregarArista(1, 6, 3.0);
 		g.agregarArista(1, 3, 8.0);
@@ -151,24 +150,6 @@ public class GrafoPesadoUnidireccionalTest {
 		_grafo.obtenerCaminoMinimo(0, 2);
 	}
 	
-	@Test
-	public void obtenerMenorTest() throws Exception {
-
-		Method obtenerMenor = _grafo.getClass().getDeclaredMethod("obtenerMenor", HashMap.class, Set.class);
-		obtenerMenor.setAccessible(true);
-		
-		HashMap<Integer, Double> hashMapPrueba = new HashMap<>();
-		hashMapPrueba.put(1, 5.0);
-		hashMapPrueba.put(2, 7.0);
-		hashMapPrueba.put(3, 9.0);
-		
-		Set<Integer> setPrueba = new HashSet<Integer>();
-		setPrueba.add(1);
-		
-		assertEquals(new Integer(2), obtenerMenor.invoke(_grafo, hashMapPrueba, setPrueba));
-		
-	}
-
 	@Test
 	public void sePuedeLlegarTest() throws Exception {
 

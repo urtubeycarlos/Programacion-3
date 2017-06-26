@@ -1,11 +1,9 @@
 package grafo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 import matriz.MatrizRelacional;
@@ -68,95 +66,78 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 	}
 
 	public List<E> obtenerCaminoMinimo(E origen, E destino){
-
+		
 		super.checkearVertice(origen, "obtener un camino minimo");
 		super.checkearVertice(destino, "obtener un camino minimo");
 		
 		if( !sePuedeLlegar(origen, destino) )
 			throw new RuntimeException( "No se puede llegar a destino = " + destino );
+			
+		LinkedList<E> camino = new LinkedList<E>();
 		
-		E nodo_actual;
-
-		HashMap<E, Double> distancias = new HashMap<E, Double>();
-		for( E vertice:super.getVertices() )
-			distancias.put(vertice, Double.POSITIVE_INFINITY);
-		distancias.put(origen, 0.0);
-		
-		List<E> camino_actual = new LinkedList<E>();
-		Set<E> visitados = new HashSet<E>();
-		
-		while( !visitados.contains(destino) ){
-			
-			nodo_actual = obtenerMenor(distancias, visitados); 
-			
-			if( camino_actual.isEmpty() )
-				camino_actual.add(nodo_actual);
-			else {
-				for(int i=0; i<camino_actual.size(); i++){
-					E nodo = camino_actual.get(i);
-					if( !camino_actual.contains(nodo_actual) && !nodo.equals(nodo_actual) && existeArista(nodo, nodo_actual) )
-						camino_actual.add(i+1, nodo_actual);
-				}
-					
-			}
-			
-			visitados.add(nodo_actual);
-			
-			
-
-			for( E nodo_j:super.getVecinos(nodo_actual) ) if( nodo_j != null && !visitados.contains(nodo_j) ){
-				Double calc_distancia = distancias.get(nodo_actual) + getPeso(nodo_actual, nodo_j);
-				if ( calc_distancia < distancias.get(nodo_j) ){
-					distancias.put(nodo_j, calc_distancia);
-				}
-			}
+		if ( origen.equals(destino) ){
+			camino.add(origen);
+			return camino;
 		}
+			
 
-		camino_actual = camino_actual.subList(0, camino_actual.indexOf(destino)+1);
-		System.out.println( "Camino: " + camino_actual );
+		Nodo nodo_inicial = new Nodo(origen, 0.0);
+		Nodo nodo_final = new Nodo(destino, Double.POSITIVE_INFINITY);
 		
-//		E nodo_sobrante;
-//		while( (nodo_sobrante = getNodoSobrante(camino_actual, distancias) ) != null )
-//			camino_actual.remove(nodo_sobrante);
-//		
-//		System.out.println( "Camino despues de depurar: " + camino_actual );
-//		
-		return camino_actual;
-	}
-	
-	private E getNodoSobrante(List<E> camino, HashMap<E, Double> distancias){
-		for(int i=1; i<camino.size()-1; i++){
+		PriorityQueue<Nodo> nodos_abiertos = new PriorityQueue<Nodo>( (n1, n2) -> (int) (n1.costo - n2.costo) );
+		nodos_abiertos.add(nodo_inicial);
+		nodos_abiertos.add(nodo_final);
+		Set<Nodo> nodos_cerrados = new HashSet<Nodo>();
+		
+		Nodo nodo_actual = null;
+		
+		while( !nodos_abiertos.isEmpty() ){
 			
-			E anterior = camino.get(i-1);
-			E actual = camino.get(i);
-			E siguiente = camino.get(i+1);
+			nodo_actual = nodos_abiertos.poll();
+			if( nodo_actual.equals(nodo_final) )
+				break;
 			
-			if( !existeArista(actual, siguiente) )
-				return actual;
+			nodos_cerrados.add(nodo_actual);
 			
-			if( existeArista(anterior, siguiente) ){
-				
-				List<E> con_actual = new ArrayList<E>(camino);
-				List<E> sin_actual = new ArrayList<E>(camino);
-				sin_actual.remove(actual);
+			for( E vecino:getVecinos(nodo_actual.val) ){
+				if( vecino != null ){
+					Nodo nodo_vecino = new Nodo(vecino);
+					if( !nodos_cerrados.contains(nodo_vecino) ){
 
-				double peso_acum_con_actual = calcularPeso(con_actual);
-				double peso_acum_sin_actual = calcularPeso(sin_actual);
-				if( peso_acum_sin_actual < peso_acum_con_actual )
-					return actual;
-				
+						if( nodos_abiertos.contains(nodo_vecino) ){
+							
+							for( Nodo n:nodos_abiertos )
+								if( n.equals(nodo_vecino) )
+									nodo_vecino = n;
+							
+							if( nodo_actual.costo + getPeso(nodo_actual.val, nodo_vecino.val) <= nodo_vecino.costo ){
+								nodo_vecino.costo = nodo_actual.costo + getPeso(nodo_actual.val, nodo_vecino.val);
+								nodo_vecino.padre = nodo_actual;
+							}
+							
+						} else {
+							nodo_vecino.costo = nodo_actual.costo + getPeso(nodo_actual.val, nodo_vecino.val);
+							nodo_vecino.padre = nodo_actual;
+							nodos_abiertos.add( nodo_vecino );
+						}
+						
+						
+					}
+				}
 			}
-		} return null;
-	}
-	
-	private double calcularPeso(List<E> camino){
-		double ret = 0.0;
-		for(int i=0; i<camino.size()-1; i++)
-			ret += this.getPeso(camino.get(i), camino.get(i+1));
-		return ret;
+			
+		}
+		
+		Nodo n = nodo_actual;
+		do {
+			camino.addFirst( n.val );
+			n = n.padre;
+		} while ( n != null );
+		
+		return camino;
 		
 	}
-	
+
 	private boolean sePuedeLlegar(E origen, E destino){
 		E nodo_actual = destino;
 		boolean cambio_nodo;
@@ -173,21 +154,6 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 		} return true;
 	}
 	
-	private E obtenerMenor(HashMap<E, Double> dist_tentativas, Set<E> visitados){
-		
-		E ret = null;
-		Double menor_actual = Double.POSITIVE_INFINITY;
-
-		for( Entry<E, Double> entry:dist_tentativas.entrySet() ){
-			if( entry.getValue() < menor_actual && !visitados.contains( entry.getKey() ) ){
-				menor_actual = entry.getValue();
-				ret = entry.getKey();
-			}
-		} return ret;
-	}
-	
-	
-	
 	@Override
 	public String toString(){
 		String ret = new String("Grafo Pesado Unidireccional: {");
@@ -195,6 +161,31 @@ public class GrafoPesadoUnidireccional<E> extends GrafoUnidireccional<E> {
 		for( E vecino:getVecinos(vertice) )
 			ret += "[" + vertice +":" + vecino + "]: " + getPeso(vertice, vecino) + "; ";
 		return ret = ret.substring(0, ret.length()-2) + "}";
+	}
+
+	
+	private class Nodo {
+		
+		Nodo padre = null;
+		E val = null;
+		double costo = 0.0;
+		
+		public Nodo(E val){
+			this.val = val;
+		}
+		
+		public Nodo(E val, double costo){
+			this.val = val;
+			this.costo = costo;
+		}
+		
+		@Override
+		public boolean equals(Object o){
+			@SuppressWarnings("unchecked")
+			Nodo in = (Nodo) o;
+			return val.equals(in.val);
+		}
+		
 	}
 	
 }

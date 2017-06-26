@@ -1,6 +1,5 @@
 package mapa;
 
-import java.io.LineNumberInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
