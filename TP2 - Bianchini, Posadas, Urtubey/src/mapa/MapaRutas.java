@@ -75,7 +75,7 @@ public class MapaRutas implements Mapa {
 	@Override
 	public List<Coordenada> obtenerRutaOptima(Coordenada origen, Coordenada destino, int cantPeajesMax) {
 
-		if( cantPeajesMax >= cantPeajes() )
+		if( cantPeajes() <= cantPeajesMax )
 			return obtenerRutaOptima(origen, destino);
 		
 		if( cantPeajesMax == 0 )
@@ -90,9 +90,12 @@ public class MapaRutas implements Mapa {
 		for( int c=0; c<cantPeajesMax; c++ ){ //Se guardan n referencias a los vertices de nuevo, con n la cantidad de peajes maxima que quiero.
 											 //Tambien calcula los destinos.
 			referenciasCoordenadas.addAll( _listaCoordenadas );
-			destinos.add( _listaCoordenadas.indexOf(destino) + c*_grafoCiudades.cantVertices());
 		}
 
+		for( int c=0; c<cantPeajesMax; c++ ){
+			destinos.add( _listaCoordenadas.indexOf(destino) + c*_grafoCiudades.cantVertices());
+		}
+		
 		//Agrega los vertices al grafo en capas
 		for( Integer vertice=0; vertice<referenciasCoordenadas.size(); vertice++ )
 			grafoEnCapas.agregarVertice(vertice);
@@ -100,10 +103,10 @@ public class MapaRutas implements Mapa {
 		
 		
 		//Setea las aristas del grafo en capas segun la cantidad maxima de peajes.
-		for(int c=0; c<cantPeajesMax; c++){
+		for(int c=0; c<=cantPeajesMax; c++){
 			
 			for(Integer vertice:_grafoCiudades.getVertices())
-			for(Integer vecino:_grafoCiudades.getVecinos(vertice))
+			for(Integer vecino:_grafoCiudades.getVecinos(vertice)) if( vecino != null )
 				if(_grafoCiudades.existeArista(vertice, vecino))
 					if( !_matrizPeajes.get(vertice, vecino) ) //Si no tiene peaje...
 						grafoEnCapas.agregarArista( _grafoCiudades.cantVertices() * c + vertice, _grafoCiudades.cantVertices() * c + vecino, _grafoCiudades.getPeso(vertice, vecino) );
@@ -118,14 +121,17 @@ public class MapaRutas implements Mapa {
 		//Busca camino minimo con todos los posibles destino. Esta con un try porque puede 
 		//ser que no se pueda llegar y devuelva una excepcion.
 		List<ArrayList<Integer>> resultados = new ArrayList<ArrayList<Integer>>();
+		System.out.println( "Destinos: " + destinos );
 		for( Integer dest:destinos ){
 			try {
-				resultados.add( (ArrayList<Integer>) grafoEnCapas.obtenerCaminoMinimo( referenciasCoordenadas.indexOf(origen) , dest) );
+				resultados.add( (ArrayList<Integer>) grafoEnCapas.obtenerCaminoMinimo( _listaCoordenadas.indexOf(origen) , dest) );
 			} catch (Exception e){
 				continue;
 			}
 		}
-			
+		
+		System.out.println( "Resultados: " + resultados );
+		
 		//De los mejores caminos con todos los posibles destinos se busca cual es el mejor.
 		for( Integer indice:obtenerMejorResultado(resultados, grafoEnCapas) )
 			ret.add( referenciasCoordenadas.get(indice) );
@@ -193,6 +199,11 @@ public class MapaRutas implements Mapa {
 				
 		} return ret;
 		
+	}
+
+	@Override
+	public Coordenada getCoordenada(int i) {
+		return _listaCoordenadas.get(i).clonar();
 	}
 	
 }

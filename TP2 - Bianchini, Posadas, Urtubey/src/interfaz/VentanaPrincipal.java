@@ -184,7 +184,8 @@ public class VentanaPrincipal {
 					habilitarBotones(false);
 				}
 				catch (Exception exception){
-					mostrarError(exception.getMessage());
+					exception.printStackTrace();
+//					mostrarError(exception.getMessage());
 				}
 			}
 		});
