@@ -63,7 +63,9 @@ public class Interfaz {
 			mapa.agregarCoordenada(coord2);
 
 			mapa.agregarRuta(coord1, coord2, conPeaje);
-			mapa.agregarRuta(coord2, coord1, conPeaje);
+			
+			// FIXME: La linea de abajo hace que explote el codigo.
+//			mapa.agregarRuta(coord2, coord1, conPeaje);
 		}
 	}
 
