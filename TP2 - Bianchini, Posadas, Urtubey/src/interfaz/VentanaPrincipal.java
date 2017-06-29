@@ -28,6 +28,14 @@ import java.awt.Point;
 import javax.swing.JCheckBox;
 
 public class VentanaPrincipal {
+	/*
+	 * Esta clase implementa la interfaz grafica y muestra el mapa interactivo con los botones que permiten
+	 * agregar y quitar puntos y rutas del mismo, ademas de campos con informacion sobre las coordenadas con
+	 * las que se esta trabajando actualmente, y otras opciones. Permite agregar puntos y rutas y obtener el
+	 * camino minimo entre dos puntos cualesquiera. Instancia un objeto Interfaz que se utiliza para manejar
+	 * la lógica de la ventana, modificar sus campos en base a las rutas y puntos creados, y calcular el
+	 * camino minimo que luego se dibujara por pantalla en el JMAP.
+	 */
 	
 	private JFrame frame;
 	private static JMapViewerTree mapViewerTree;
@@ -177,15 +185,19 @@ public class VentanaPrincipal {
 		
 		// Action listeners
 		btnObtenerCamino.addActionListener(new ActionListener() {
+			
 			@Override
+			/**
+			 * Si se presiona el boton obtener camino minimo, se intentara pedirle dicha funcion a la interfaz.
+			 * En caso de que la misma devuelva una excepcio, se mostrara el cartel con el error.
+			 */
 			public void actionPerformed(ActionEvent e) {
 				try{
 					interfaz.obtenerCaminoMinimo(map, campoPeajes, chckbxPeaje);
 					habilitarBotones(false);
 				}
 				catch (Exception exception){
-					exception.printStackTrace();
-//					mostrarError(exception.getMessage());
+					mostrarError(exception.getMessage());
 				}
 			}
 		});
@@ -289,6 +301,15 @@ public class VentanaPrincipal {
 		}
 	}
 	
+	/**
+	 * Mientras este seleccionado alguno de los botones del panel que agregan o remueven informacion del mapa,
+	 * este metodo llamara al metodo correspondiente a agregar un punto, una ruta, o no agregar nada.
+	 * @param map JMAP
+	 * @param agregarRuta
+	 * @param agregarInicio
+	 * @param agregarDestino
+	 * @param chckbxPeaje
+	 */
 	private void escucharSeleccionDePuntos(JMapViewer map, JButton agregarRuta, JButton agregarInicio, JButton agregarDestino, JCheckBox chckbxPeaje){
 		if (agregarRuta.isSelected()){
 			seleccionandoRuta(chckbxPeaje);
@@ -323,12 +344,19 @@ public class VentanaPrincipal {
 		}
 	}
 	
+	/**
+	 * Dibuja una linea entre dos puntos del mapa
+	 * @param chckbxPeaje campo de la ventana que contiene un tilde si estamos agragando peaje
+	 */
 	private void dibujarLineaEntrePuntosSeleccionados(JCheckBox chckbxPeaje) {
 		Coordinate inicio = this.puntosSeleccionados.get(0).getCoordinate();
 		Coordinate destino = this.puntosSeleccionados.get(1).getCoordinate();
 		dibujarLineaEntrePuntos(inicio, destino, null, chckbxPeaje, map());
 	}
 	
+	/**
+	 * Deselecciona todos los botones de la ventana
+	 */
 	private void deseleccionarBotones() {
 		Enumeration<AbstractButton> botones = botonesDelPanel.getElements();
 		while (botones.hasMoreElements()){
@@ -338,6 +366,10 @@ public class VentanaPrincipal {
 		}
 	}
 	
+	/**
+	 * Habilita o dehabilita los botones de la ventana
+	 * @param flag booleano que determina si se habilita o si se deshabilita
+	 */
 	private void habilitarBotones(boolean flag){
 		Enumeration<AbstractButton> botones = botonesDelPanel.getElements();
 		while (botones.hasMoreElements()){
@@ -351,6 +383,15 @@ public class VentanaPrincipal {
 			this.puntosSeleccionados.clear();
 	}
 	
+	/**
+	 * Dibuja una linea recta en el JMAP desde una coordenada inicio hasta una destino, con un color determinado
+	 * Tiene en cuenta si se está dibujando una ruta con peaje o no.
+	 * @param inicio coordenada de inicio
+	 * @param destino coordenada de inicio
+	 * @param color 
+	 * @param chckbxPeaje
+	 * @param map JMAP
+	 */
 	static void dibujarLineaEntrePuntos(Coordinate inicio, Coordinate destino, Color color, JCheckBox chckbxPeaje, JMapViewer map) {
 		List<Coordinate> ruta = new ArrayList<Coordinate>(Arrays.asList(inicio, destino, destino));
 		MapPolygonImpl rutaMap = new MapPolygonImpl(ruta);

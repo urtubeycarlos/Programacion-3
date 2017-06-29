@@ -162,7 +162,7 @@ public class MapaRutas implements Mapa {
 		List<Integer> resultado;
 		List<Coordenada> ret = new ArrayList<Coordenada>();
 		
-		for( Integer vertice:copiaGrafo.getVertices() ) //posible problema: iterando sobre lista y eliminando objetos de ella
+		for( Integer vertice:copiaGrafo.getVertices() )
 		for( Integer vecino:copiaGrafo.getVecinos(vertice) )
 			if( _matrizPeajes.get(vertice, vecino) )
 				copiaGrafo.eliminarArista(vertice, vecino);
